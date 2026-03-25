@@ -11,7 +11,7 @@ public class Usuario {
 
     @Id
     @Column(name = "codigo")
-    private String codigo;
+    private Integer codigo;
 
     @Column(nullable = false, unique = true)
     private String username;
@@ -31,7 +31,7 @@ public class Usuario {
     public Usuario() {
     }
 
-    public Usuario(String codigo, String username, String password, String email, String rol, int estado) {
+    public Usuario(Integer codigo, String username, String password, String email, String rol, int estado) {
         this.codigo = codigo;
         this.username = username;
         this.password = password;
@@ -40,11 +40,11 @@ public class Usuario {
         this.estado = estado;
     }
 
-    public String getCodigo() {
+    public Integer getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(String codigo) {
+    public void setCodigo(Integer codigo) {
         this.codigo = codigo;
     }
 

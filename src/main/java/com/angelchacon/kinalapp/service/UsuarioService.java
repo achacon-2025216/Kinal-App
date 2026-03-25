@@ -1,6 +1,5 @@
 package com.angelchacon.kinalapp.service;
 
-
 import com.angelchacon.kinalapp.entity.Usuario;
 import com.angelchacon.kinalapp.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
@@ -13,39 +12,47 @@ import java.util.Optional;
 @Transactional
 public class UsuarioService implements IUsuarioService {
 
+    // Repositorio que maneja los datos de Usuario
     private final UsuarioRepository usuarioRepository;
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
 
+    // Devuelve todos los usuarios
     @Override
     @Transactional(readOnly = true)
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
 
+    // Devuelve solo los usuarios activos (estado = 1)
     @Override
     @Transactional(readOnly = true)
     public List<Usuario> listarActivos() {
         return usuarioRepository.findByEstado(1);
     }
 
+    // Guarda un usuario nuevo o actualiza si ya existe
     @Override
     public Usuario guardar(Usuario usuario) {
-        validarUsuario(usuario);
-        if (usuario.getEstado() == 0) usuario.setEstado(1);
+        validarUsuario(usuario); // valida que los campos obligatorios estén completos
+        if (usuario.getEstado() == 0 || usuario.getEstado() == 0) {
+            usuario.setEstado(1); // por defecto lo activa
+        }
         return usuarioRepository.save(usuario);
     }
 
+    // Busca un usuario por su código
     @Override
     @Transactional(readOnly = true)
-    public Optional<Usuario> buscarPorCodigo(String codigo) {
+    public Optional<Usuario> buscarPorCodigo(Integer codigo) {
         return usuarioRepository.findById(codigo);
     }
 
+    // Actualiza los datos de un usuario existente
     @Override
-    public Usuario actualizar(String codigo, Usuario usuario) {
+    public Usuario actualizar(Integer codigo, Usuario usuario) {
         if (!usuarioRepository.existsById(codigo)) {
             throw new RuntimeException("Usuario no encontrado con código " + codigo);
         }
@@ -54,24 +61,26 @@ public class UsuarioService implements IUsuarioService {
         return usuarioRepository.save(usuario);
     }
 
+    // Elimina un usuario por su código
     @Override
-    public void eliminar(String codigo) {
+    public void eliminar(Integer codigo) {
         if (!usuarioRepository.existsById(codigo)) {
             throw new RuntimeException("Usuario no encontrado con código " + codigo);
         }
         usuarioRepository.deleteById(codigo);
     }
 
+    // Verifica si un usuario existe por su código
     @Override
     @Transactional(readOnly = true)
-    public boolean existePorCodigo(String codigo) {
+    public boolean existePorCodigo(Integer codigo) {
         return usuarioRepository.existsById(codigo);
     }
 
-    // Validaciones internas
+    // Validaciones internas: revisa que los campos obligatorios estén completos
     private void validarUsuario(Usuario usuario) {
-        if (usuario.getCodigo() == null || usuario.getCodigo().trim().isEmpty()) {
-            throw new IllegalArgumentException("El código es obligatorio");
+        if (usuario.getCodigo() == null || usuario.getCodigo() <= 0) {
+            throw new IllegalArgumentException("El código es obligatorio y debe ser mayor que 0");
         }
         if (usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()) {
             throw new IllegalArgumentException("El username es obligatorio");

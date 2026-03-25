@@ -32,7 +32,7 @@ public class UsuarioController {
 
     // Buscar por código
     @GetMapping("/{codigo}")
-    public ResponseEntity<Usuario> buscarPorCodigo(@PathVariable String codigo) {
+    public ResponseEntity<Usuario> buscarPorCodigo(@PathVariable Integer codigo) {
         Optional<Usuario> usuario = usuarioService.buscarPorCodigo(codigo);
         return usuario.map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -47,14 +47,14 @@ public class UsuarioController {
 
     // Actualizar
     @PutMapping("/{codigo}")
-    public ResponseEntity<Usuario> actualizar(@PathVariable String codigo, @RequestBody Usuario usuario) {
+    public ResponseEntity<Usuario> actualizar(@PathVariable Integer codigo, @RequestBody Usuario usuario) {
         Usuario actualizado = usuarioService.actualizar(codigo, usuario);
         return ResponseEntity.ok(actualizado);
     }
 
     // Eliminar
     @DeleteMapping("/{codigo}")
-    public ResponseEntity<Void> eliminar(@PathVariable String codigo) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer codigo) {
         usuarioService.eliminar(codigo);
         return ResponseEntity.noContent().build();
     }
