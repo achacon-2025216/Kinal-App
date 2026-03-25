@@ -39,7 +39,7 @@ public class VentaController {
 
     // ACTUALIZAR
     @PutMapping("/{codigo}")
-    public ResponseEntity<Venta> actualizar(@PathVariable String codigo, @RequestBody Venta venta) {
+    public ResponseEntity<Venta> actualizar(@PathVariable int codigo, @RequestBody Venta venta) {
         venta.setCodigoVenta(codigo);
         return ResponseEntity.ok(ventaService.guardar(venta));
     }

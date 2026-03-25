@@ -10,8 +10,8 @@ public interface IUsuarioService {
     List<Usuario> listarTodos();
     List<Usuario> listarActivos();
     Usuario guardar(Usuario usuario);
-    Optional<Usuario> buscarPorCodigo(String codigo);
-    Usuario actualizar(String codigo, Usuario usuario);
-    void eliminar(String codigo);
-    boolean existePorCodigo(String codigo);
+    Optional<Usuario> buscarPorCodigo(Integer codigo);
+    Usuario actualizar(Integer codigo, Usuario usuario);
+    void eliminar(Integer codigo);
+    boolean existePorCodigo(Integer codigo);
 }

@@ -1,6 +1,8 @@
 package com.angelchacon.kinalapp.entity;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -9,13 +11,13 @@ public class Venta {
 
     @Id
     @Column(name = "codigo_venta")
-    private String codigoVenta;
+    private int codigoVenta;
 
     @Column(name = "fecha_venta", nullable = false)
     private LocalDate fechaVenta;
 
     @Column(nullable = false)
-    private double total;
+    private BigDecimal total;
 
     @Column
     private int estado;
@@ -32,7 +34,7 @@ public class Venta {
 
     public Venta() {}
 
-    public Venta(String codigoVenta, LocalDate fechaVenta, double total, int estado, Cliente cliente, Usuario usuario) {
+    public Venta(int codigoVenta, LocalDate fechaVenta, BigDecimal total, int estado, Cliente cliente, Usuario usuario) {
         this.codigoVenta = codigoVenta;
         this.fechaVenta = fechaVenta;
         this.total = total;
@@ -43,11 +45,11 @@ public class Venta {
 
     // GETTERS Y SETTERS
 
-    public String getCodigoVenta() {
+    public int getCodigoVenta() {
         return codigoVenta;
     }
 
-    public void setCodigoVenta(String codigoVenta) {
+    public void setCodigoVenta(int codigoVenta) {
         this.codigoVenta = codigoVenta;
     }
 
@@ -59,11 +61,11 @@ public class Venta {
         this.fechaVenta = fechaVenta;
     }
 
-    public double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 
