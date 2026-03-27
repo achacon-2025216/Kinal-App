@@ -10,10 +10,10 @@ public class DetalleVenta {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_detalle_venta")
-    private int codigoDetalleVenta;
+    private Integer codigoDetalleVenta;
 
     @Column
-    private int cantidad;
+    private Integer cantidad;
 
     @Column(name = "precio_unitario")
     private BigDecimal precioUnitario;
@@ -21,30 +21,41 @@ public class DetalleVenta {
     @Column
     private BigDecimal subtotal;
 
-    @Column(name = "Productos_codigo_producto")
-    private int codigoProducto;
+    @ManyToOne
+    @JoinColumn(name = "Productos_codigo_producto")
+    private Producto producto;
 
-    @Column(name = "Ventas_codigo_venta")
-    private int codigoVenta;
+    @ManyToOne
+    @JoinColumn(name = "Ventas_codigo_venta")
+    private Venta venta;
 
-    public DetalleVenta() {}
+    public DetalleVenta() {
+    }
+
+    public DetalleVenta(Integer codigoDetalleVenta, Integer cantidad, BigDecimal precioUnitario, BigDecimal subtotal, Producto producto, Venta venta) {
+        this.codigoDetalleVenta = codigoDetalleVenta;
+        this.cantidad = cantidad;
+        this.precioUnitario = precioUnitario;
+        this.subtotal = subtotal;
+        this.producto = producto;
+        this.venta = venta;
+    }
 
     // getters y setters
 
-
-    public int getCodigoDetalleVenta() {
+    public Integer getCodigoDetalleVenta() {
         return codigoDetalleVenta;
     }
 
-    public void setCodigoDetalleVenta(int codigoDetalleVenta) {
+    public void setCodigoDetalleVenta(Integer codigoDetalleVenta) {
         this.codigoDetalleVenta = codigoDetalleVenta;
     }
 
-    public int getCantidad() {
+    public Integer getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
 
@@ -64,19 +75,19 @@ public class DetalleVenta {
         this.subtotal = subtotal;
     }
 
-    public int getCodigoProducto() {
-        return codigoProducto;
+    public Producto getProducto() {
+        return producto;
     }
 
-    public void setCodigoProducto(int codigoProducto) {
-        this.codigoProducto = codigoProducto;
+    public void setProducto(Producto producto) {
+        this.producto = producto;
     }
 
-    public int getCodigoVenta() {
-        return codigoVenta;
+    public Venta getVenta() {
+        return venta;
     }
 
-    public void setCodigoVenta(int codigoVenta) {
-        this.codigoVenta = codigoVenta;
+    public void setVenta(Venta venta) {
+        this.venta = venta;
     }
 }

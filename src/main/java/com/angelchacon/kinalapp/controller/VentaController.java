@@ -25,7 +25,7 @@ public class VentaController {
 
     // BUSCAR
     @GetMapping("/{codigo}")
-    public ResponseEntity<Venta> buscar(@PathVariable String codigo) {
+    public ResponseEntity<Venta> buscar(@PathVariable Integer codigo) {
         return ventaService.buscarPorCodigo(codigo)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -33,8 +33,12 @@ public class VentaController {
 
     // GUARDAR
     @PostMapping
-    public ResponseEntity<Venta> guardar(@RequestBody Venta venta) {
-        return ResponseEntity.ok(ventaService.guardar(venta));
+    public ResponseEntity<?> guardar(@RequestBody Venta venta) {
+        try {
+            return ResponseEntity.ok(ventaService.guardar(venta));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     // ACTUALIZAR
@@ -46,7 +50,7 @@ public class VentaController {
 
     // ELIMINAR
     @DeleteMapping("/{codigo}")
-    public ResponseEntity<Void> eliminar(@PathVariable String codigo) {
+    public ResponseEntity<Void> eliminar(@PathVariable Integer codigo) {
         ventaService.eliminar(codigo);
         return ResponseEntity.noContent().build();
     }

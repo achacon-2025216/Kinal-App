@@ -1,5 +1,6 @@
 package com.angelchacon.kinalapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -11,8 +12,9 @@ public class Venta {
 
     @Id
     @Column(name = "codigo_venta")
-    private int codigoVenta;
+    private Integer codigoVenta;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "fecha_venta", nullable = false)
     private LocalDate fechaVenta;
 
@@ -20,21 +22,22 @@ public class Venta {
     private BigDecimal total;
 
     @Column
-    private int estado;
+    private Integer estado;
 
     // RELACION CON CLIENTE
     @ManyToOne
-    @JoinColumn(name = "clientes_dpi_cliente")
+    @JoinColumn(name = "clientes_dpi_cliente", referencedColumnName = "dpi_cliente")
     private Cliente cliente;
 
     // RELACION CON USUARIO
     @ManyToOne
-    @JoinColumn(name = "usuario_codigo_usuario")
+    @JoinColumn(name = "usuario_codigo_usuario", referencedColumnName = "codigo")
     private Usuario usuario;
+
 
     public Venta() {}
 
-    public Venta(int codigoVenta, LocalDate fechaVenta, BigDecimal total, int estado, Cliente cliente, Usuario usuario) {
+    public Venta(Integer codigoVenta, LocalDate fechaVenta, BigDecimal total, Integer estado, Cliente cliente, Usuario usuario) {
         this.codigoVenta = codigoVenta;
         this.fechaVenta = fechaVenta;
         this.total = total;
@@ -45,11 +48,12 @@ public class Venta {
 
     // GETTERS Y SETTERS
 
-    public int getCodigoVenta() {
+
+    public Integer getCodigoVenta() {
         return codigoVenta;
     }
 
-    public void setCodigoVenta(int codigoVenta) {
+    public void setCodigoVenta(Integer codigoVenta) {
         this.codigoVenta = codigoVenta;
     }
 
@@ -69,11 +73,11 @@ public class Venta {
         this.total = total;
     }
 
-    public int getEstado() {
+    public Integer getEstado() {
         return estado;
     }
 
-    public void setEstado(int estado) {
+    public void setEstado(Integer estado) {
         this.estado = estado;
     }
 

@@ -9,6 +9,6 @@ public interface IVentaService {
 
     List<Venta> listarTodos();
     Venta guardar(Venta venta);
-    Optional<Venta> buscarPorCodigo(String codigo);
-    void eliminar(String codigo);
+    Optional<Venta> buscarPorCodigo(Integer codigo);
+    void eliminar(Integer codigo);
 }
