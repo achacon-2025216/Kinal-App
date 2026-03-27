@@ -22,11 +22,11 @@ public class DetalleVenta {
     private BigDecimal subtotal;
 
     @ManyToOne
-    @JoinColumn(name = "Productos_codigo_producto")
+    @JoinColumn(name = "productos_codigo_producto")
     private Producto producto;
 
     @ManyToOne
-    @JoinColumn(name = "Ventas_codigo_venta")
+    @JoinColumn(name = "ventas_codigo_venta")
     private Venta venta;
 
     public DetalleVenta() {
