@@ -9,7 +9,7 @@ public class Producto {
 
     @Id
     @Column(name = "codigo_producto")
-    private int codigoProducto;
+    private Integer codigoProducto;
 
     @Column(name = "nombre_producto")
     private String nombreProducto;
@@ -18,14 +18,14 @@ public class Producto {
     private BigDecimal precio;
 
     @Column
-    private int stock;
+    private Integer stock;
 
     @Column
-    private int estado;
+    private Integer estado;
 
     public Producto() {}
 
-    public Producto(int codigoProducto, String nombreProducto, BigDecimal precio, int stock, int estado) {
+    public Producto(Integer codigoProducto, String nombreProducto, BigDecimal precio, Integer stock, Integer estado) {
         this.codigoProducto = codigoProducto;
         this.nombreProducto = nombreProducto;
         this.precio = precio;
@@ -34,11 +34,13 @@ public class Producto {
     }
 
     // getters y setters
-    public int getCodigoProducto() {
+
+
+    public Integer getCodigoProducto() {
         return codigoProducto;
     }
 
-    public void setCodigoProducto(int codigoProducto) {
+    public void setCodigoProducto(Integer codigoProducto) {
         this.codigoProducto = codigoProducto;
     }
 
@@ -58,19 +60,19 @@ public class Producto {
         this.precio = precio;
     }
 
-    public int getStock() {
+    public Integer getStock() {
         return stock;
     }
 
-    public void setStock(int stock) {
+    public void setStock(Integer stock) {
         this.stock = stock;
     }
 
-    public int getEstado() {
+    public Integer getEstado() {
         return estado;
     }
 
-    public void setEstado(int estado) {
+    public void setEstado(Integer estado) {
         this.estado = estado;
     }
 }

@@ -11,7 +11,7 @@ import jakarta.persistence.Table;
 public class Cliente {
     @Id
     @Column (name = "dpi_cliente")
-    private String DPICliente;
+    private String dpiCliente;
     @Column
     private String nombreCliente;
     @Column
@@ -19,25 +19,29 @@ public class Cliente {
     @Column
     private String direccion;
     @Column
-    private int estado;
+    private Integer estado;
 
     public Cliente() {
     }
 
-    public Cliente(String DPICliente, String nombreCliente, String apellidoCliente, String direccion, int estado) {
-        this.DPICliente = DPICliente;
+    public Cliente(String dpiCliente, String nombreCliente, String apellidoCliente, String direccion, Integer estado) {
+        this.dpiCliente = dpiCliente;
         this.nombreCliente = nombreCliente;
         this.apellidoCliente = apellidoCliente;
         this.direccion = direccion;
         this.estado = estado;
     }
 
-    public String getDPICliente() {
-        return DPICliente;
+    public String getdpiCliente() {
+        return dpiCliente;
     }
 
-    public void setDPICliente(String DPICliente) {
-        this.DPICliente = DPICliente;
+    public String getDpiCliente() {
+        return dpiCliente;
+    }
+
+    public void setDpiCliente(String dpiCliente) {
+        this.dpiCliente = dpiCliente;
     }
 
     public String getNombreCliente() {
@@ -64,11 +68,11 @@ public class Cliente {
         this.direccion = direccion;
     }
 
-    public int getEstado() {
+    public Integer getEstado() {
         return estado;
     }
 
-    public void setEstado(int estado) {
+    public void setEstado(Integer estado) {
         this.estado = estado;
     }
 }

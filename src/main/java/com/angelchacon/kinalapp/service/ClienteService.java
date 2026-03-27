@@ -83,7 +83,7 @@ public class ClienteService implements IClienteService {
             throw new RuntimeException("El cliente no se encontro con el DPI"+dpi);
             //si no existe se lanza una exception(error controlado)
         }
-        cliente.setDPICliente(dpi);
+        cliente.setDpiCliente(dpi);
         //Aseguramps que el DPI del obejeto conincida con el de la RUL
         //Por seguridad usamos el DPI de la URL y no el que viene en el JSON
         validarCliente(cliente);
@@ -117,7 +117,7 @@ public class ClienteService implements IClienteService {
         *Validaciones del negocio: este metodo hara privado porque
         * es algo interno del servicio
         **/
-        if (cliente.getDPICliente() == null || cliente.getDPICliente().trim().isEmpty()){
+        if (cliente.getdpiCliente() == null || cliente.getdpiCliente().trim().isEmpty()){
             //Si el dpi es null o esta vacio despues de quitar espaicos
             //lanza una excepcion con un mensaje
             throw new IllegalArgumentException("El DPI es un dato obligatorio");
