@@ -25,7 +25,7 @@ public class ClienteController {
     public String listar(Model model) {
         List<Cliente> clientes = clienteService.listarTodos();
         model.addAttribute("listaClientes", clientes); // Esto lo lee el th:each
-        return "clientes/listar";
+        return "html/listarCliente";
     }
 
     // 2. FORMULARIO NUEVO: Crea un objeto vacío y abre la página
@@ -33,7 +33,7 @@ public class ClienteController {
     public String formularioNuevo(Model model) {
         model.addAttribute("cliente", new Cliente());
         model.addAttribute("esEdicion", false);
-        return "clientes/formulario";
+        return "html/crudCliente";
     }
 
     // 3. EDITAR: Busca el cliente por DPI y lo manda al formulario
