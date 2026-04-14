@@ -1,10 +1,60 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Kinal App - Inicio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:reft="@{/css/indes.css}">
 </head>
 <body>
+
+<div class="container py-5">
+    <header class="text-center mb-5">
+        <h1 class="display-4 fw-bold text-primary">Sistema de Gestión Kinal</h1>
+        <p class="lead">¿Qué deseas gestionar hoy?</p>
+    </header>
+
+    <div class="row g-4 justify-content-center">
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        <i class="display-4 text-primary bi bi-people"></i>
+                    </div>
+                    <h3 class="card-title">Clientes</h3>
+                    <p class="card-text text-muted">Registro de DPI, nombres y direcciones.</p>
+                    <a th:href="@{/clientes}" class="btn btn-primary w-100">Ir a Clientes</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Productos</h3>
+                    <p class="card-text text-muted">Gestión de inventario y precios.</p>
+                    <a href="#" class="btn btn-dark w-100 disabled">Próximamente</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body text-center">
+                    <h3 class="card-title">Configuración</h3>
+                    <p class="card-text text-muted">Ajustes del sistema y perfiles.</p>
+                    <a href="#" class="btn btn-secondary w-100 disabled">Cerrar Sesión</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer class="text-center mt-5 text-muted">
+    <p>&copy; 2026 Fundación Kinal</p>
+</footer>
 
 </body>
 </html>
