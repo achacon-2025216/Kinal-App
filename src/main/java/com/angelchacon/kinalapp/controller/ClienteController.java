@@ -48,7 +48,7 @@ public class ClienteController {
 
     // 4. GUARDAR: Recibe los datos y hace un "redirect" a la tabla
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Cliente cliente) {
+    public String guardar(@RequestBody Cliente cliente) {
         clienteService.guardar(cliente);
         return "redirect:/clientes";
     }
