@@ -1,7 +1,6 @@
 package com.angelchacon.kinalapp.controller;
 
 import com.angelchacon.kinalapp.entity.Cliente;
-import com.angelchacon.kinalapp.repository.ClienteRepository;
 import com.angelchacon.kinalapp.service.IClienteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
