@@ -2,41 +2,70 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Listado de Clientes</title>
+    <title>Gestión de Clientes - Kinal</title>
     <link rel="stylesheet" th:href="@{/css/listarCliente.css}">
 </head>
 <body>
 
-<h2>Gestión de Clientes - Kinal</h2>
+<div class="container">
+    <h2>Gestión de Clientes - Kinal</h2>
 
-<a th:href="@{/clientes/nuevo}" class="btn btn-nuevo">Añadir Nuevo Cliente</a>
+    <div class="card-formulario">
+        <h3 th:text="${clienteEditando != null} ? 'Editar Cliente' : 'Nuevo Cliente'"></h3>
+        <form th:action="@{/clientes/guardar}" method="post">
+            <div class="form-group">
+                <label>DPI:</label>
+                <input type="text" name="dpiCliente"
+                       th:value="${clienteEditando != null} ? ${clienteEditando.dpiCliente} : ''"
+                       th:readonly="${clienteEditando != null}" required />
+            </div>
+            <div class="form-group">
+                <label>Nombre:</label>
+                <input type="text" name="nombreCliente"
+                       th:value="${clienteEditando != null} ? ${clienteEditando.nombreCliente} : ''" required />
+            </div>
+            <div class="form-group">
+                <label>Apellido:</label>
+                <input type="text" name="apellidoCliente"
+                       th:value="${clienteEditando != null} ? ${clienteEditando.apellidoCliente} : ''" required />
+            </div>
+            <div class="form-group">
+                <label>Dirección:</label>
+                <input type="text" name="direccion"
+                       th:value="${clienteEditando != null} ? ${clienteEditando.direccion} : ''" required />
+            </div>
 
-<table class="tabla-clientes">
-    <thead>
-    <tr>
-        <th>DPI</th>
-        <th>Nombre</th>
-        <th>Apellido</th>
-        <th>Dirección</th>
-        <th>Acciones</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="cliente : ${listaClientes}">
-        <td th:text="${cliente.dpiCliente}"></td>
-        <td th:text="${cliente.nombreCliente}"></td>
-        <td th:text="${cliente.apellidoCliente}"></td>
-        <td th:text="${cliente.direccion}"></td>
-        <td>
-            <a th:href="@{/clientes/editar/{id}(id=${cliente.dpiCliente})}" class="btn btn-editar">Editar</a>
-            <a th:href="@{/clientes/eliminar/{id}(id=${cliente.dpiCliente})}" class="btn btn-eliminar">Eliminar</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
+            <button type="submit" class="btn btn-nuevo">
+                <span th:text="${clienteEditando != null} ? 'Actualizar' : 'Guardar'"></span>
+            </button>
+            <a th:if="${clienteEditando != null}" th:href="@{/clientes}" class="btn btn-eliminar">Cancelar</a>
+        </form>
+    </div>
 
-<br>
-<a th:href="@{/}" style="color: #007bff;">Volver al Inicio</a>
+    <table class="tabla-clientes">
+        <thead>
+        <tr>
+            <th>DPI</th>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Dirección</th>
+            <th>Acciones</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="cliente : ${listaClientes}">
+            <td th:text="${cliente.dpiCliente}"></td>
+            <td th:text="${cliente.nombreCliente}"></td>
+            <td th:text="${cliente.apellidoCliente}"></td>
+            <td th:text="${cliente.direccion}"></td>
+            <td>
+                <a th:href="@{/clientes/editar/{id}(id=${cliente.dpiCliente})}" class="btn btn-editar">Editar</a>
+                <a th:href="@{/clientes/eliminar/{id}(id=${cliente.dpiCliente})}" class="btn btn-eliminar">Eliminar</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
 </body>
 </html>
