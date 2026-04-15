@@ -18,16 +18,25 @@
     <div class="row g-4">
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm p-4 form-card">
-                <h3 class="mb-4" style="color: #141A3D;">Nuevo Producto</h3>
+                <h3 class="mb-4" style="color: #141A3D;"
+                    th:text="${productoEditando.codigoProducto != null} ? 'Editar Producto' : 'Nuevo Producto'">
+                    Nuevo Producto
+                </h3>
+
                 <form th:action="@{/productos/guardar}" th:object="${productoEditando}" method="post">
-                    <div class="mb-3">
+
+                    <input type="hidden" th:field="*{codigoProducto}">
+
+                    <div class="mb-3" th:if="${productoEditando.codigoProducto == null}">
                         <label class="form-label fw-semibold">Código</label>
                         <input type="number" th:field="*{codigoProducto}" class="form-control" placeholder="ID del producto" required>
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Nombre del Producto</label>
                         <input type="text" th:field="*{nombreProducto}" class="form-control" placeholder="Ej. Urban Sneakers X" required>
                     </div>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label fw-semibold">Precio (Q)</label>
@@ -38,12 +47,19 @@
                             <input type="number" th:field="*{stock}" class="form-control" placeholder="Cant." required>
                         </div>
                     </div>
+
                     <div class="d-grid gap-2 mt-3">
-                        <button type="submit" class="btn btn-save">
-                            <i class="bi bi-plus-circle"></i> Guardar Producto
+                        <button type="submit" class="btn btn-save btn-primary">
+                            <i class="bi bi-save"></i>
+                            <span th:text="${productoEditando.codigoProducto != null} ? ' Actualizar' : ' Guardar'"></span>
                         </button>
+
+                        <a th:href="@{/productos}" class="btn btn-light border" th:if="${productoEditando.codigoProducto != null}">
+                            Cancelar
+                        </a>
+
                         <a th:href="@{/}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Volver
+                            <i class="bi bi-arrow-left"></i> Volver al Inicio
                         </a>
                     </div>
                 </form>
@@ -70,12 +86,18 @@
                             <td class="fw-bold" th:text="${p.nombreProducto}"></td>
                             <td th:text="'Q' + ${p.precio}"></td>
                             <td>
-                                    <span th:class="${p.stock < 10} ? 'badge bg-danger' : 'badge bg-success'"
-                                          th:text="${p.stock}"></span>
+                                <span th:class="${p.stock < 10} ? 'badge bg-danger' : 'badge bg-success'"
+                                      th:text="${p.stock}"></span>
                             </td>
                             <td class="text-center">
+                                <a th:href="@{/productos/editar/{id}(id=${p.codigoProducto})}"
+                                   class="btn btn-outline-warning btn-sm me-1">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+
                                 <a th:href="@{/productos/eliminar/{id}(id=${p.codigoProducto})}"
-                                   class="btn btn-delete btn-sm">
+                                   class="btn btn-outline-danger btn-sm"
+                                   onclick="return confirm('¿Eliminar este producto?')">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </td>
