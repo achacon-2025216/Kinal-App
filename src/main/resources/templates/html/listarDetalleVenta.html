@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Kinal App - Detalles de Venta</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/listarDetalle.css}">
+</head>
+<body>
+
+<div class="container py-5">
+    <header class="text-center mb-5">
+        <h1 style="color: #141A3D; font-weight: 700;">Detalles de Facturación</h1>
+        <p class="text-muted">Asignación de artículos a ventas registradas</p>
+    </header>
+
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
+                <h4 class="mb-4" style="color: #141A3D;">Agregar Item</h4>
+                <form th:action="@{/detalles/guardar}" th:object="${detalleNuevo}" method="post">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Seleccionar Venta (ID)</label>
+                        <select th:field="*{venta.codigoVenta}" class="form-select" required>
+                            <option value="" disabled selected>--- Seleccione Venta ---</option>
+                            <option th:each="v : ${listaVentas}" th:value="${v.codigoVenta}" th:text="'Venta #' + ${v.codigoVenta}"></option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Producto</label>
+                        <select th:field="*{producto.codigoProducto}" class="form-select" required>
+                            <option value="" disabled selected>--- Seleccione Producto ---</option>
+                            <option th:each="p : ${listaProductos}" th:value="${p.codigoProducto}" th:text="${p.nombreProducto}"></option>
+                        </select>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-bold">Cantidad</label>
+                            <input type="number" th:field="*{cantidad}" class="form-control" required min="1">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-bold">Precio Unit.</label>
+                            <input type="number" step="0.01" th:field="*{precioUnitario}" class="form-control" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 mt-3">
+                        <button type="submit" class="btn text-white" style="background-color: #141A3D;">
+                            <i class="bi bi-plus-circle"></i> Agregar al Detalle
+                        </button>
+                        <a th:href="@{/}" class="btn btn-light border">Regresar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+            <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead style="background-color: #141A3D; color: white;">
+                        <tr>
+                            <th>Venta</th>
+                            <th>Producto</th>
+                            <th>Cant.</th>
+                            <th>Precio U.</th>
+                            <th>Subtotal</th>
+                            <th>Acción</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="d : ${listaDetalles}">
+                            <td th:text="'#' + ${d.venta.codigoVenta}"></td>
+                            <td th:text="${d.producto.nombreProducto}"></td>
+                            <td th:text="${d.cantidad}"></td>
+                            <td th:text="'Q' + ${d.precioUnitario}"></td>
+                            <td class="fw-bold text-primary" th:text="'Q' + ${d.subtotal}"></td>
+                            <td>
+                                <a th:href="@{/detalles/eliminar/{id}(id=${d.codigoDetalleVenta})}" class="text-danger">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
