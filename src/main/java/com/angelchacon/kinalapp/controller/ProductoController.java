@@ -16,40 +16,32 @@ public class ProductoController {
 
     private final IProductoService productoService;
 
-    // Inyección por constructor (mejor práctica)
     public ProductoController(IProductoService productoService) {
         this.productoService = productoService;
     }
 
-    // Obtener todos
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("listaProductos", productoService.listarTodos());
-        model.addAttribute("productoEditando", new Producto()); // Para el formulario
+        model.addAttribute("productoEditando", new Producto());
         return "html/listarProducto";
     }
 
-    // Obtener uno por ID
-    @GetMapping("/{id}")
-    public Optional<Producto> buscar(@PathVariable Integer id) {
-        return productoService.buscarPorCodigo(id);
-    }
-
-    // Guardar
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Producto producto) {
         productoService.guardar(producto);
         return "redirect:/productos";
     }
 
-    //  Actualizar
-    @PutMapping("/{id}")
-    public Producto actualizar(@PathVariable Integer id, @RequestBody Producto producto) {
-        producto.setCodigoProducto(id);
-        return productoService.guardar(producto);
+    @GetMapping("/editar/{id}")
+    public String editar(@PathVariable Integer id, Model model) {
+        // Buscamos el producto y lo mandamos al formulario
+        model.addAttribute("productoEditando", productoService.buscarPorCodigo(id).orElse(new Producto()));
+        // Cargamos la lista para la tabla
+        model.addAttribute("listaProductos", productoService.listarTodos());
+        return "html/listarProducto";
     }
 
-    // Eliminar
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Integer id) {
         productoService.eliminar(id);
