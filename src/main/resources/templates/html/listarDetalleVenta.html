@@ -18,14 +18,22 @@
     <div class="row g-4">
         <div class="col-md-4">
             <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
-                <h4 class="mb-4" style="color: #141A3D;">Agregar Item</h4>
+                <h4 class="mb-4" style="color: #141A3D;"
+                    th:text="${detalleNuevo.codigoDetalleVenta != null} ? 'Editar Item' : 'Agregar Item'">
+                    Agregar Item
+                </h4>
+
                 <form th:action="@{/detalles/guardar}" th:object="${detalleNuevo}" method="post">
+
+                    <input type="hidden" th:field="*{codigoDetalleVenta}">
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Seleccionar Venta (ID)</label>
                         <select th:field="*{venta.codigoVenta}" class="form-select" required>
                             <option value="" disabled selected>--- Seleccione Venta ---</option>
-                            <option th:each="v : ${listaVentas}" th:value="${v.codigoVenta}" th:text="'Venta #' + ${v.codigoVenta}"></option>
+                            <option th:each="v : ${listaVentas}"
+                                    th:value="${v.codigoVenta}"
+                                    th:text="'Venta #' + ${v.codigoVenta}"></option>
                         </select>
                     </div>
 
@@ -33,7 +41,9 @@
                         <label class="form-label fw-bold">Producto</label>
                         <select th:field="*{producto.codigoProducto}" class="form-select" required>
                             <option value="" disabled selected>--- Seleccione Producto ---</option>
-                            <option th:each="p : ${listaProductos}" th:value="${p.codigoProducto}" th:text="${p.nombreProducto}"></option>
+                            <option th:each="p : ${listaProductos}"
+                                    th:value="${p.codigoProducto}"
+                                    th:text="${p.nombreProducto}"></option>
                         </select>
                     </div>
 
@@ -50,8 +60,14 @@
 
                     <div class="d-grid gap-2 mt-3">
                         <button type="submit" class="btn text-white" style="background-color: #141A3D;">
-                            <i class="bi bi-plus-circle"></i> Agregar al Detalle
+                            <i class="bi bi-save"></i>
+                            <span th:text="${detalleNuevo.codigoDetalleVenta != null} ? ' Actualizar Item' : ' Agregar al Detalle'"></span>
                         </button>
+
+                        <a th:href="@{/detalles}" class="btn btn-secondary border" th:if="${detalleNuevo.codigoDetalleVenta != null}">
+                            Cancelar Edición
+                        </a>
+
                         <a th:href="@{/}" class="btn btn-light border">Regresar</a>
                     </div>
                 </form>
@@ -69,7 +85,7 @@
                             <th>Cant.</th>
                             <th>Precio U.</th>
                             <th>Subtotal</th>
-                            <th>Acción</th>
+                            <th>Acciones</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -78,15 +94,23 @@
                             <td th:text="${d.producto.nombreProducto}"></td>
                             <td th:text="${d.cantidad}"></td>
                             <td th:text="'Q' + ${d.precioUnitario}"></td>
-                            <td class="fw-bold text-primary" th:text="'Q' + ${d.subtotal}"></td>
+                            <td class="fw-bold text-primary" th:text="${d.subtotal != null} ? 'Q' + ${d.subtotal} : 'Q0.00'"></td>
                             <td>
-                                <a th:href="@{/detalles/eliminar/{id}(id=${d.codigoDetalleVenta})}" class="text-danger">
+                                <a th:href="@{/detalles/editar/{id}(id=${d.codigoDetalleVenta})}" class="btn btn-sm btn-outline-warning me-1">
+                                    <i class="bi bi-pencil-square"></i>
+                                </a>
+
+                                <a th:href="@{/detalles/eliminar/{id}(id=${d.codigoDetalleVenta})}" class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('¿Deseas eliminar este item del detalle?')">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </td>
                         </tr>
                         </tbody>
                     </table>
+                </div>
+                <div th:if="${#lists.isEmpty(listaDetalles)}" class="alert alert-info text-center mt-3">
+                    No hay detalles registrados para las ventas.
                 </div>
             </div>
         </div>
