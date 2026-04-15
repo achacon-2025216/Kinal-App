@@ -9,6 +9,9 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "ventas")
 public class Venta {
+    
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    private java.util.List<DetalleVenta> detalles;
 
     @Id
     @Column(name = "codigo_venta")
