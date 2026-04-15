@@ -65,9 +65,9 @@ public class VentaController {
     }
 
     // ELIMINAR
-    @DeleteMapping("/{codigo}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer codigo) {
-        ventaService.eliminar(codigo);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable Integer id) {
+        ventaService.eliminar(id);
+        return "redirect:/ventas";
     }
 }

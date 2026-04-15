@@ -53,7 +53,7 @@
                             <option value="" disabled selected>--- Seleccione Vendedor ---</option>
                             <option th:each="u : ${listaUsuarios}"
                                     th:value="${u.codigo}"
-                                    th:text="${u.nombreUsuario}"></option>
+                                    th:text="${u.username}"></option>
                         </select>
                     </div>
 
@@ -90,7 +90,7 @@
                             <td th:text="${v.cliente.nombreCliente}"></td>
                             <td class="fw-bold text-success" th:text="'Q' + ${v.total}"></td>
                             <td class="px-3">
-                                <a th:href="@{/ventas/eliminar/{id}(id=${v.codigoVenta})}" class="btn btn-outline-danger btn-sm">
+                                <a th:href="@{/ventas/eliminar/{id}(id=${v.codigoVenta})}" class="btn btn-sm btn-outline-danger">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </td>
