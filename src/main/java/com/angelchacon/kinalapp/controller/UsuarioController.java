@@ -3,12 +3,14 @@ package com.angelchacon.kinalapp.controller;
 import com.angelchacon.kinalapp.entity.Usuario;
 import com.angelchacon.kinalapp.service.IUsuarioService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
@@ -18,44 +20,29 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // Listar todos
     @GetMapping
-    public List<Usuario> listarTodos() {
-        return usuarioService.listarTodos();
+    public String listar(Model model) {
+        model.addAttribute("listaUsuarios", usuarioService.listarTodos());
+        model.addAttribute("usuarioEditando", new Usuario());
+        return "html/listarUsuario";
     }
 
-    // Listar activos
-    @GetMapping("/activos")
-    public List<Usuario> listarActivos() {
-        return usuarioService.listarActivos();
+    @PostMapping("/guardar")
+    public String guardar(@ModelAttribute("usuarioEditando") Usuario usuario) {
+        usuarioService.guardar(usuario);
+        return "redirect:/usuarios";
     }
 
-    // Buscar por código
-    @GetMapping("/{codigo}")
-    public ResponseEntity<Usuario> buscarPorCodigo(@PathVariable Integer codigo) {
-        Optional<Usuario> usuario = usuarioService.buscarPorCodigo(codigo);
-        return usuario.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+    @GetMapping("/editar/{codigo}")
+    public String editar(@PathVariable Integer codigo, Model model) {
+        model.addAttribute("listaUsuarios", usuarioService.listarTodos());
+        model.addAttribute("usuarioEditando", usuarioService.buscarPorCodigo(codigo).orElse(new Usuario()));
+        return "html/listarUsuario";
     }
 
-    // Guardar
-    @PostMapping
-    public ResponseEntity<Usuario> guardar(@RequestBody Usuario usuario) {
-        Usuario nuevo = usuarioService.guardar(usuario);
-        return ResponseEntity.ok(nuevo);
-    }
-
-    // Actualizar
-    @PutMapping("/{codigo}")
-    public ResponseEntity<Usuario> actualizar(@PathVariable Integer codigo, @RequestBody Usuario usuario) {
-        Usuario actualizado = usuarioService.actualizar(codigo, usuario);
-        return ResponseEntity.ok(actualizado);
-    }
-
-    // Eliminar
-    @DeleteMapping("/{codigo}")
-    public ResponseEntity<Void> eliminar(@PathVariable Integer codigo) {
+    @GetMapping("/eliminar/{codigo}")
+    public String eliminar(@PathVariable Integer codigo) {
         usuarioService.eliminar(codigo);
-        return ResponseEntity.noContent().build();
+        return "redirect:/usuarios";
     }
 }
