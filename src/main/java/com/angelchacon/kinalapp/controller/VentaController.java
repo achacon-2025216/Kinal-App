@@ -1,5 +1,7 @@
 package com.angelchacon.kinalapp.controller;
 
+import com.angelchacon.kinalapp.entity.Cliente;
+import com.angelchacon.kinalapp.entity.Usuario;
 import com.angelchacon.kinalapp.entity.Venta;
 import com.angelchacon.kinalapp.service.IVentaService;
 import org.springframework.stereotype.Controller;
@@ -22,10 +24,15 @@ public class VentaController {
     // LISTAR
     @GetMapping
     public String listar(Model model) {
-        // Esto manda la lista y una venta vacía a la página
+        Venta nuevaVenta = new Venta();
+        nuevaVenta.setCliente(new Cliente()); // Inicializa el cliente para evitar el null
+        nuevaVenta.setUsuario(new Usuario()); // Inicializa el usuario
+
+        model.addAttribute("ventaEditando", nuevaVenta);
         model.addAttribute("listaVentas", ventaService.listarTodos());
-        model.addAttribute("ventaEditando", new Venta());
-        return "html/listarVenta"; // Esto busca el archivo HTML que creaste arriba
+        model.addAttribute("listaClientes", clienteService.listarTodos());
+        model.addAttribute("listaUsuarios", usuarioService.listarTodos());
+        return "html/listarVenta";
     }
 
     // BUSCAR

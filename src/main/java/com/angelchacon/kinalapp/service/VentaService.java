@@ -34,15 +34,22 @@ public class VentaService implements IVentaService {
 
     @Override
     public Venta guardar(Venta venta) {
+        // 1. Validar que la venta traiga un cliente y un usuario
+        if (venta.getCliente() == null || venta.getCliente().getDpiCliente() == null) {
+            throw new RuntimeException("Error: Debe seleccionar un cliente.");
+        }
+        if (venta.getUsuario() == null || venta.getUsuario().getCodigo() == null) {
+            throw new RuntimeException("Error: Debe seleccionar un usuario.");
+        }
 
-        Cliente cliente = clienteRepository
-                .findById(venta.getCliente().getDpiCliente())
-                .orElseThrow(() -> new RuntimeException("Cliente no existe"));
+        // 2. Buscar los objetos reales en la base de datos
+        Cliente cliente = clienteRepository.findById(venta.getCliente().getDpiCliente())
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-        Usuario usuario = usuarioRepository
-                .findById(venta.getUsuario().getCodigo())
-                .orElseThrow(() -> new RuntimeException("Usuario no existe"));
+        Usuario usuario = usuarioRepository.findById(venta.getUsuario().getCodigo())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
+        // 3. Asignarlos a la venta
         venta.setCliente(cliente);
         venta.setUsuario(usuario);
 
