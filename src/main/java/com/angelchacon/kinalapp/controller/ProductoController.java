@@ -3,12 +3,14 @@ package com.angelchacon.kinalapp.controller;
 import com.angelchacon.kinalapp.entity.Producto;
 import com.angelchacon.kinalapp.service.IProductoService;
 
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 
-@RestController
+@Controller
 @RequestMapping("/productos")
 public class ProductoController {
 
@@ -21,8 +23,10 @@ public class ProductoController {
 
     // Obtener todos
     @GetMapping
-    public List<Producto> listar() {
-        return productoService.listarTodos();
+    public String listar(Model model) {
+        model.addAttribute("listaProductos", productoService.listarTodos());
+        model.addAttribute("productoEditando", new Producto()); // Para el formulario
+        return "html/listarProducto";
     }
 
     // Obtener uno por ID
@@ -32,9 +36,10 @@ public class ProductoController {
     }
 
     // Guardar
-    @PostMapping
-    public Producto guardar(@RequestBody Producto producto) {
-        return productoService.guardar(producto);
+    @PostMapping("/guardar")
+    public String guardar(@ModelAttribute Producto producto) {
+        productoService.guardar(producto);
+        return "redirect:/productos";
     }
 
     //  Actualizar
@@ -45,8 +50,9 @@ public class ProductoController {
     }
 
     // Eliminar
-    @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Integer id) {
+    @GetMapping("/eliminar/{id}")
+    public String eliminar(@PathVariable Integer id) {
         productoService.eliminar(id);
+        return "redirect:/productos";
     }
 }
