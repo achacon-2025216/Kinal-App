@@ -24,7 +24,7 @@ public class ClienteController {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("listaClientes", clienteService.listarTodos());
-        model.addAttribute("cliente", new Cliente()); // Objeto para la modal (crear/editar)
+        model.addAttribute("clienteEditando", new Cliente()); // Objeto para la modal (crear/editar)
         return "html/listarCliente";
     }
 
@@ -47,7 +47,7 @@ public class ClienteController {
         model.addAttribute("listaClientes", clienteService.listarTodos());
 
         // 3. Pasamos el cliente encontrado al objeto que usa el formulario
-        model.addAttribute("clienteEditado", cliente);
+        model.addAttribute("clienteEditando", cliente);
         model.addAttribute("esEdicion", true);
 
         return "html/listarCliente";

@@ -7,40 +7,54 @@
 </head>
 <body>
 
-<div class="container">
-    <h2>Gestión de Clientes - Kinal</h2>
+<div class="card-formulario">
+    <h3 th:text="${clienteEditando?.dpiCliente != null} ? 'Editar Cliente' : 'Nuevo Cliente'"></h3>
 
-    <div class="card-formulario">
-        <h3 th:text="${clienteEditando != null} ? 'Editar Cliente' : 'Nuevo Cliente'"></h3>
-        <form th:action="@{/clientes/guardar}" method="post">
-            <div class="form-group">
-                <label>DPI:</label>
-                <input type="text" name="dpiCliente"
-                       th:value="${clienteEditando != null} ? ${clienteEditando.dpiCliente} : ''"
-                       th:readonly="${clienteEditando != null}" required />
-            </div>
+    <form th:action="@{/clientes/guardar}" th:object="${clienteEditando}" method="post">
+
+        <div class="form-row"> <div class="form-group">
+            <label>DPI:</label>
+            <input type="text" th:field="*{dpiCliente}"
+                   th:readonly="${clienteEditando?.dpiCliente != null}"
+                   class="form-control" required />
+        </div>
+
             <div class="form-group">
                 <label>Nombre:</label>
-                <input type="text" name="nombreCliente"
-                       th:value="${clienteEditando != null} ? ${clienteEditando.nombreCliente} : ''" required />
-            </div>
-            <div class="form-group">
-                <label>Apellido:</label>
-                <input type="text" name="apellidoCliente"
-                       th:value="${clienteEditando != null} ? ${clienteEditando.apellidoCliente} : ''" required />
-            </div>
-            <div class="form-group">
-                <label>Dirección:</label>
-                <input type="text" name="direccion"
-                       th:value="${clienteEditando != null} ? ${clienteEditando.direccion} : ''" required />
+                <input type="text" th:field="*{nombreCliente}" class="form-control" required />
             </div>
 
-            <button type="submit" class="btn btn-nuevo">
-                <span th:text="${clienteEditando != null} ? 'Actualizar' : 'Guardar'"></span>
-            </button>
-            <a th:if="${clienteEditando != null}" th:href="@{/clientes}" class="btn btn-eliminar">Cancelar</a>
-        </form>
+            <div class="form-group">
+                <label>Apellido:</label>
+                <input type="text" th:field="*{apellidoCliente}" class="form-control" required />
+            </div>
+
+            <div class="form-group">
+                <label>Dirección:</label>
+                <input type="text" th:field="*{direccion}" class="form-control" required />
+            </div>
+
+            <div class="botones-container" style="margin-top: 20px;">
+                <button type="submit" class="btn btn-nuevo">
+                    <span th:text="${clienteEditando?.dpiCliente != null} ? 'Actualizar' : 'Guardar'"></span>
+                </button>
+
+                <a th:if="${clienteEditando?.dpiCliente != null}"
+                   th:href="@{/clientes}"
+                   class="btn btn-eliminar"
+                   style="margin-left: 10px; text-decoration: none; display: inline-block;">
+                    Cancelar
+                </a>
+            </div>
+        </div>
+
+        <hr style="margin: 20px 0;"> <div style="text-align: center;">
+        <a th:href="@{/}" class="btn-editar" style="text-decoration: none; padding: 10px 20px; display: inline-block; background-color: #ffc107; color: black; border-radius: 5px;">
+            ← Volver al inicio de la App
+        </a>
     </div>
+    </form>
+</div>
 
     <table class="tabla-clientes">
         <thead>
