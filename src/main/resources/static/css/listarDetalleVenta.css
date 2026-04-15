@@ -1,0 +1,17 @@
+body {
+    background-color: #f8f9fa;
+}
+
+.card {
+    border-top: 5px solid #141A3D !important;
+}
+
+.table thead th {
+    border: none;
+    padding: 12px;
+}
+
+.btn:hover {
+    filter: brightness(1.2);
+    transform: translateY(-1px);
+}
