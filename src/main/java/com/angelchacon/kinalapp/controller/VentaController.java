@@ -27,12 +27,12 @@ public class VentaController {
         this.usuarioService = usuarioService;
     }
 
-    // LISTAR
+    // LISTAR (Carga inicial)
     @GetMapping
     public String listar(Model model) {
         Venta nuevaVenta = new Venta();
-        nuevaVenta.setCliente(new Cliente()); // Inicializa el cliente para evitar el null
-        nuevaVenta.setUsuario(new Usuario()); // Inicializa el usuario
+        nuevaVenta.setCliente(new Cliente());
+        nuevaVenta.setUsuario(new Usuario());
 
         model.addAttribute("ventaEditando", nuevaVenta);
         model.addAttribute("listaVentas", ventaService.listarTodos());
@@ -41,27 +41,29 @@ public class VentaController {
         return "html/listarVenta";
     }
 
-    // BUSCAR
-    @GetMapping("/{codigo}")
-    public ResponseEntity<Venta> buscar(@PathVariable Integer codigo) {
-        return ventaService.buscarPorCodigo(codigo)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // GUARDAR
+    // GUARDAR O ACTUALIZAR (Spring detecta el ID automáticamente)
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Venta venta) {
         ventaService.guardar(venta);
-        return "redirect:/ventas"; // Recarga la página para ver la nueva venta
+        return "redirect:/ventas";
     }
 
+    // EDITAR (Carga los datos de una venta específica en el formulario)
+    @GetMapping("/editar/{id}")
+    public String editar(@PathVariable Integer id, Model model) {
+        // Buscamos la venta por su ID
+        Venta v = ventaService.buscarPorCodigo(id).orElse(new Venta());
 
-    // ACTUALIZAR
-    @PutMapping("/{codigo}")
-    public ResponseEntity<Venta> actualizar(@PathVariable int codigo, @RequestBody Venta venta) {
-        venta.setCodigoVenta(codigo);
-        return ResponseEntity.ok(ventaService.guardar(venta));
+        // Si la venta existe pero los objetos internos son null, los inicializamos
+        if (v.getCliente() == null) v.setCliente(new Cliente());
+        if (v.getUsuario() == null) v.setUsuario(new Usuario());
+
+        model.addAttribute("ventaEditando", v);
+        model.addAttribute("listaVentas", ventaService.listarTodos());
+        model.addAttribute("listaClientes", clienteService.listarTodos());
+        model.addAttribute("listaUsuarios", usuarioService.listarTodos());
+
+        return "html/listarVenta";
     }
 
     // ELIMINAR
