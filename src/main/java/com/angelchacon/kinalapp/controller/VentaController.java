@@ -2,12 +2,14 @@ package com.angelchacon.kinalapp.controller;
 
 import com.angelchacon.kinalapp.entity.Venta;
 import com.angelchacon.kinalapp.service.IVentaService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
-@RestController
+@Controller
 @RequestMapping("/ventas")
 public class VentaController {
 
@@ -19,8 +21,11 @@ public class VentaController {
 
     // LISTAR
     @GetMapping
-    public List<Venta> listar() {
-        return ventaService.listarTodos();
+    public String listar(Model model) {
+        // Esto manda la lista y una venta vacía a la página
+        model.addAttribute("listaVentas", ventaService.listarTodos());
+        model.addAttribute("ventaEditando", new Venta());
+        return "html/listarVenta"; // Esto busca el archivo HTML que creaste arriba
     }
 
     // BUSCAR
@@ -32,14 +37,12 @@ public class VentaController {
     }
 
     // GUARDAR
-    @PostMapping
-    public ResponseEntity<?> guardar(@RequestBody Venta venta) {
-        try {
-            return ResponseEntity.ok(ventaService.guardar(venta));
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    @PostMapping("/guardar")
+    public String guardar(@ModelAttribute Venta venta) {
+        ventaService.guardar(venta);
+        return "redirect:/ventas"; // Recarga la página para ver la nueva venta
     }
+
 
     // ACTUALIZAR
     @PutMapping("/{codigo}")
