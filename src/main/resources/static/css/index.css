@@ -1,16 +1,80 @@
-/* style.css */
+/* Importar fuente moderna */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+
 body {
-    background-color: #f8f9fa;
+    background-color: #f4f7f6; /* Un gris muy suave para que las tarjetas resalten */
+    font-family: 'Inter', sans-serif;
 }
 
+/* Contenedor principal */
+.main-container {
+    max-width: 1100px;
+    margin: 50px auto;
+    padding: 20px;
+}
+
+/* Estilo del Título Central */
+header h1 {
+    color: #141A3D;
+    font-weight: 700;
+    font-size: 3rem;
+    margin-bottom: 5px;
+}
+
+header p {
+    color: #6c757d;
+    font-size: 1.2rem;
+    margin-bottom: 40px;
+}
+
+/* Cuadrícula de tarjetas */
+.grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+/* Mejora de las Tarjetas (Cards) */
 .card {
-    transition: transform 0.2s;
+    background: white;
+    border: none;
+    border-radius: 16px;
+    padding: 35px;
+    text-align: center;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); /* Sombra sutil */
+    transition: all 0.3s ease;
 }
 
 .card:hover {
-    transform: scale(1.05);
+    transform: translateY(-10px); /* Efecto de elevación */
+    box-shadow: 0 12px 30px rgba(0,98,255,0.15); /* Sombra azulada al pasar el mouse */
 }
 
-header h1 {
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+.card h2 {
+    color: #1d2643; /* El azul oscuro de tu tabla */
+    font-size: 1.6rem;
+    margin-bottom: 10px;
+}
+
+.card p {
+    color: #7d8da1;
+    font-size: 0.95rem;
+    margin-bottom: 25px;
+}
+
+/* Estilo para los botones */
+.btn-index {
+    background-color: #0062ff;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    transition: background 0.3s ease;
+}
+
+.btn-index:hover {
+    background-color: #004ecc;
+    color: white;
 }
