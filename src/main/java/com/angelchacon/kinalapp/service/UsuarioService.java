@@ -36,10 +36,15 @@ public class UsuarioService implements IUsuarioService {
     // Guarda un usuario nuevo o actualiza si ya existe
     @Override
     public Usuario guardar(Usuario usuario) {
-        validarUsuario(usuario); // valida que los campos obligatorios estén completos
-        if (usuario.getEstado() == 0 || usuario.getEstado() == 0) {
-            usuario.setEstado(1); // por defecto lo activa
+        // 1. Primero asignamos los valores por defecto
+        if (usuario.getEstado() == null) {
+            usuario.setEstado(1);
         }
+
+        // 2. Ahora sí validamos (ya no habrá NullPointerException aquí)
+        validarUsuario(usuario);
+
+        // 3. Guardamos
         return usuarioRepository.save(usuario);
     }
 
