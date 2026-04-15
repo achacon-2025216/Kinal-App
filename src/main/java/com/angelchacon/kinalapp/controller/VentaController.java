@@ -3,6 +3,8 @@ package com.angelchacon.kinalapp.controller;
 import com.angelchacon.kinalapp.entity.Cliente;
 import com.angelchacon.kinalapp.entity.Usuario;
 import com.angelchacon.kinalapp.entity.Venta;
+import com.angelchacon.kinalapp.service.IClienteService;
+import com.angelchacon.kinalapp.service.IUsuarioService;
 import com.angelchacon.kinalapp.service.IVentaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,9 +18,13 @@ import java.util.List;
 public class VentaController {
 
     private final IVentaService ventaService;
+    private final IClienteService clienteService;
+    private final IUsuarioService usuarioService;
 
-    public VentaController(IVentaService ventaService) {
+    public VentaController(IVentaService ventaService, IClienteService clienteService, IUsuarioService usuarioService) {
         this.ventaService = ventaService;
+        this.clienteService = clienteService;
+        this.usuarioService = usuarioService;
     }
 
     // LISTAR
