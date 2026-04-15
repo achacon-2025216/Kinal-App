@@ -20,8 +20,8 @@ public class DetalleVentaService implements IDetalleVentaService {
     private final VentaRepository ventaRepository;
 
     public DetalleVentaService(DetalleVentaRepository repository,
-                               ProductoRepository productoRepository,
-                               VentaRepository ventaRepository) {
+       ProductoRepository productoRepository,
+       VentaRepository ventaRepository) {
         this.repository = repository;
         this.productoRepository = productoRepository;
         this.ventaRepository = ventaRepository;

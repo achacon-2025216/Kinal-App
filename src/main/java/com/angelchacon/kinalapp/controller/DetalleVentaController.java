@@ -25,26 +25,22 @@ public class DetalleVentaController {
         this.productoService = productoService;
     }
 
+    // Listar todo al cargar la página
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("listaDetalles", detalleService.listarTodos());
         model.addAttribute("listaVentas", ventaService.listarTodos());
         model.addAttribute("listaProductos", productoService.listarTodos());
         model.addAttribute("detalleNuevo", new DetalleVenta());
-        return "html/listarDetalleVenta"; // Nombre del archivo HTML
+        return "html/listarDetalleVenta";
     }
 
+    // Guardar o Actualizar (Cálculo de subtotal incluido)
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute("detalleNuevo") DetalleVenta detalle) {
-        // 1. Verificamos que cantidad y precio no sean nulos para evitar errores
         if (detalle.getCantidad() != null && detalle.getPrecioUnitario() != null) {
-
-            // 2. Calculamos: Subtotal = Precio * Cantidad
-            // Usamos BigDecimal para que el cálculo sea exacto con los decimales
             java.math.BigDecimal cantidadComoDecimal = new java.math.BigDecimal(detalle.getCantidad());
             java.math.BigDecimal resultado = detalle.getPrecioUnitario().multiply(cantidadComoDecimal);
-
-            // 3. Le asignamos el resultado al objeto antes de mandarlo a la DB
             detalle.setSubtotal(resultado);
         }
 
@@ -52,13 +48,23 @@ public class DetalleVentaController {
         return "redirect:/detalles";
     }
 
+    // Editar
+    @GetMapping("/editar/{id}")
+    public String editar(@PathVariable Integer id, Model model) {
+        // CAMBIO AQUÍ: Agregamos .orElse(null) para que no dé error de tipos
+        DetalleVenta detalle = detalleService.buscarPorId(id).orElse(null);
 
-    @PutMapping("/{id}")
-    public DetalleVenta actualizar(@PathVariable Integer id, @RequestBody DetalleVenta detalle) {
-        detalle.setCodigoDetalleVenta(id);
-        return detalleService.guardar(detalle);
+        model.addAttribute("detalleNuevo", detalle);
+
+        // Recargas las listas para que la página no se rompa
+        model.addAttribute("listaDetalles", detalleService.listarTodos());
+        model.addAttribute("listaVentas", ventaService.listarTodos());
+        model.addAttribute("listaProductos", productoService.listarTodos());
+
+        return "html/listarDetalleVenta";
     }
 
+    // Eliminar
     @GetMapping("/eliminar/{id}")
     public String eliminar(@PathVariable Integer id) {
         detalleService.eliminar(id);
