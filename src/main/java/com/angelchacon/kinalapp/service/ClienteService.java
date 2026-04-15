@@ -117,7 +117,7 @@ public class ClienteService implements IClienteService {
         *Validaciones del negocio: este metodo hara privado porque
         * es algo interno del servicio
         **/
-        if (cliente.getdpiCliente() == null || cliente.getdpiCliente().trim().isEmpty()){
+        if (cliente.getDpiCliente() == null || cliente.getDpiCliente().trim().isEmpty()){
             //Si el dpi es null o esta vacio despues de quitar espaicos
             //lanza una excepcion con un mensaje
             throw new IllegalArgumentException("El DPI es un dato obligatorio");
