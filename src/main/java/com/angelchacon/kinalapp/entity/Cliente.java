@@ -32,10 +32,6 @@ public class Cliente {
         this.estado = estado;
     }
 
-    public String getdpiCliente() {
-        return dpiCliente;
-    }
-
     public String getDpiCliente() {
         return dpiCliente;
     }

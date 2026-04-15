@@ -47,7 +47,7 @@ public class ClienteController {
         model.addAttribute("listaClientes", clienteService.listarTodos());
 
         // 3. Pasamos el cliente encontrado al objeto que usa el formulario
-        model.addAttribute("cliente", cliente);
+        model.addAttribute("clienteEditado", cliente);
         model.addAttribute("esEdicion", true);
 
         return "html/listarCliente";
@@ -55,7 +55,7 @@ public class ClienteController {
 
     // 4. GUARDAR: Recibe los datos y hace un "redirect" a la tabla
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Cliente cliente) {
+    public String guardar(@ModelAttribute ("clienteEditando")Cliente cliente) {
         clienteService.guardar(cliente);
         return "redirect:/clientes";
     }
