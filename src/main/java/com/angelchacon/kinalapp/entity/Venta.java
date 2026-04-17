@@ -14,6 +14,7 @@ public class Venta {
     private java.util.List<DetalleVenta> detalles;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo_venta")
     private Integer codigoVenta;
 
