@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URBN KICKS - Registro</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" th:href="@{/css/registro.css}">
+</head>
+<body>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+
+            <div class="card-register shadow">
+                <div class="text-center">
+                    <h2 class="title-register">REGISTRO</h2>
+                    <p class="text-muted small">Crea una cuenta para gestionar URBN KICKS</p>
+                </div>
+
+                <form th:action="@{/registro/guardar}" th:object="${usuarioNuevo}" method="post" class="mt-4">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Nombre de Usuario</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person"></i></span>
+                            <input type="text" th:field="*{username}" class="form-control" placeholder="Ej: angel_gomez" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Correo Electrónico</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" th:field="*{email}" class="form-control" placeholder="usuario@kinal.edu.gt" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small">Contraseña</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" th:field="*{password}" class="form-control" placeholder="Crea una clave segura" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small">Tipo de Acceso</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                            <select th:field="*{rol}" class="form-select" required>
+                                <option value="" selected disabled>Selecciona un rol...</option>
+                                <option value="user">Cliente (Solo Ver)</option>
+                                <option value="admin">Administrador (Control Total)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-3">
+                        <button type="submit" class="btn btn-save p-2">
+                            <i class="bi bi-check2-circle me-2"></i>Finalizar Registro
+                        </button>
+                        <a th:href="@{/}" class="btn btn-back p-2">
+                            <i class="bi bi-arrow-left me-2"></i>Volver al Login
+                        </a>
+                    </div>
+                </form>
+            </div>
+
+            <div class="text-center mt-4 text-white-50">
+                <small>Fundación Kinal 2026 - Programación Técnica</small>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
