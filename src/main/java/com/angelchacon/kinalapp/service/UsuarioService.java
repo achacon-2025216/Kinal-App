@@ -36,16 +36,32 @@ public class UsuarioService implements IUsuarioService {
     // Guarda un usuario nuevo o actualiza si ya existe
     @Override
     public Usuario guardar(Usuario usuario) {
-        // 1. Primero asignamos los valores por defecto
-        if (usuario.getEstado() == null) {
-            usuario.setEstado(1);
+        // 1. Si es un usuario nuevo, le asignamos lo mínimo para que funcione
+        if (usuario.getCodigo() == null) {
+            usuario.setEstado(1); // Activo por defecto
+
+            // Si no quieres pedir Rol ni Email, asígnalos aquí automáticamente
+            if (usuario.getRol() == null) {
+                usuario.setRol("ROLE_USER");
+            }
+            if (usuario.getEmail() == null) {
+                usuario.setEmail(usuario.getUsername() + "@kinalapp.com");
+            }
         }
 
-        // 2. Ahora sí validamos (ya no habrá NullPointerException aquí)
-        validarUsuario(usuario);
+        // 2. Validamos solo lo que tú quieres: Username y Password
+        validarRegistroBasico(usuario);
 
-        // 3. Guardamos
         return usuarioRepository.save(usuario);
+    }
+
+    private void validarRegistroBasico(Usuario usuario) {
+        if (usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de usuario es necesario");
+        }
+        if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("La contraseña es necesaria");
+        }
     }
 
     // Busca un usuario por su código
@@ -84,20 +100,13 @@ public class UsuarioService implements IUsuarioService {
 
     // Validaciones internas: revisa que los campos obligatorios estén completos
     private void validarUsuario(Usuario usuario) {
-        if (usuario.getCodigo() == null || usuario.getCodigo() <= 0) {
-            throw new IllegalArgumentException("El código es obligatorio y debe ser mayor que 0");
-        }
+        // ELIMINAMOS la validación del código aquí porque se genera solo en la DB
+
         if (usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()) {
             throw new IllegalArgumentException("El username es obligatorio");
         }
         if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
             throw new IllegalArgumentException("La contraseña es obligatoria");
-        }
-        if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("El email es obligatorio");
-        }
-        if (usuario.getRol() == null || usuario.getRol().trim().isEmpty()) {
-            throw new IllegalArgumentException("El rol es obligatorio");
         }
     }
 }

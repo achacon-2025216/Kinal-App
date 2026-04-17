@@ -1,28 +1,26 @@
 package com.angelchacon.kinalapp.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "usuarios")
 public class Usuario {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "codigo")
     private Integer codigo;
 
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false) // Quitamos el 'unique' si no es necesario, pero dejamos obligatorio
     private String password;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = true) // Cambiado a TRUE para que no sea obligatorio
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true) // Cambiado a TRUE
     private String rol;
 
     @Column
