@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
 @Controller
 public class index {
 
@@ -31,12 +33,16 @@ public class index {
                              HttpSession session,
                              Model model) {
 
-        boolean esValido = usuarioService.listarTodos().stream()
-                .anyMatch(u -> u.getUsername().equals(username) && u.getPassword().equals(password));
+        // Buscamos al usuario completo (no solo si existe)
+        Optional<Usuario> usuarioOpt = usuarioService.listarTodos().stream()
+                .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
+                .findFirst();
 
-        if (esValido) {
-            session.setAttribute("usuarioLogueado", username);
-            return "redirect:/productos"; // O a tu página principal
+        if (usuarioOpt.isPresent()) {
+            Usuario usuario = usuarioOpt.get();
+            session.setAttribute("usuarioLogueado", usuario.getUsername());
+            session.setAttribute("rol", usuario.getRol()); // GUARDAMOS EL ROL (ADMIN o USER)
+            return "redirect:/productos";
         } else {
             model.addAttribute("error", "Credenciales incorrectas.");
             return "html/login";

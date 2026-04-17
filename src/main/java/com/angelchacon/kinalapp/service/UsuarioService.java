@@ -12,92 +12,94 @@ import java.util.Optional;
 @Transactional
 public class UsuarioService implements IUsuarioService {
 
-    // Repositorio que maneja los datos de Usuario
     private final UsuarioRepository usuarioRepository;
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
     }
 
-    // Devuelve todos los usuarios
+    // 1. LISTAR TODOS
     @Override
     @Transactional(readOnly = true)
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
 
-    // Devuelve solo los usuarios activos (estado = 1)
+    // 2. LISTAR ACTIVOS
     @Override
     @Transactional(readOnly = true)
     public List<Usuario> listarActivos() {
         return usuarioRepository.findByEstado(1);
     }
 
-    // Guarda un usuario nuevo o actualiza si ya existe
+    // 3. GUARDAR (CREAR CUENTA)
     @Override
     public Usuario guardar(Usuario usuario) {
-        // 1. Primero asignamos los valores por defecto
+        // Asignación de valores por defecto para nuevos registros
         if (usuario.getEstado() == null) {
             usuario.setEstado(1);
         }
 
-        // 2. Ahora sí validamos (ya no habrá NullPointerException aquí)
-        validarUsuario(usuario);
+        if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
+            usuario.setEmail("usuario@kinalapp.com");
+        }
 
-        // 3. Guardamos
+        // Lógica de Roles: Si no se especifica, es USER (solo lectura)
+        if (usuario.getRol() == null || usuario.getRol().trim().isEmpty()) {
+            usuario.setRol("USER");
+        } else {
+            // Guardamos en minúsculas para facilitar comparaciones en el controlador
+            usuario.setRol(usuario.getRol().toLowerCase());
+        }
+
+        validarUsuario(usuario);
         return usuarioRepository.save(usuario);
     }
 
-    // Busca un usuario por su código
+    // 4. BUSCAR POR ID/CÓDIGO
     @Override
     @Transactional(readOnly = true)
     public Optional<Usuario> buscarPorCodigo(Integer codigo) {
         return usuarioRepository.findById(codigo);
     }
 
-    // Actualiza los datos de un usuario existente
+    // 5. ACTUALIZAR
     @Override
     public Usuario actualizar(Integer codigo, Usuario usuario) {
         if (!usuarioRepository.existsById(codigo)) {
-            throw new RuntimeException("Usuario no encontrado con código " + codigo);
+            throw new RuntimeException("Usuario no encontrado con código: " + codigo);
         }
-        usuario.setCodigo(codigo);
+        usuario.setCodigo(codigo); // Aseguramos que mantenga su ID original
         validarUsuario(usuario);
         return usuarioRepository.save(usuario);
     }
 
-    // Elimina un usuario por su código
+    // 6. ELIMINAR
     @Override
     public void eliminar(Integer codigo) {
         if (!usuarioRepository.existsById(codigo)) {
-            throw new RuntimeException("Usuario no encontrado con código " + codigo);
+            throw new RuntimeException("No se puede eliminar: Usuario no encontrado");
         }
         usuarioRepository.deleteById(codigo);
     }
 
-    // Verifica si un usuario existe por su código
+    // 7. EXISTE POR CÓDIGO
     @Override
     @Transactional(readOnly = true)
     public boolean existePorCodigo(Integer codigo) {
         return usuarioRepository.existsById(codigo);
     }
 
-    // Validaciones internas: revisa que los campos obligatorios estén completos
+    // --- VALIDACIONES INTERNAS ---
     private void validarUsuario(Usuario usuario) {
-        if (usuario.getCodigo() == null || usuario.getCodigo() <= 0) {
-            throw new IllegalArgumentException("El código es obligatorio y debe ser mayor que 0");
-        }
+        // Nota: El código ya no se valida aquí para permitir AUTO_INCREMENT en nuevos registros
+
         if (usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()) {
-            throw new IllegalArgumentException("El username es obligatorio");
+            throw new IllegalArgumentException("El nombre de usuario es obligatorio");
         }
+
         if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
             throw new IllegalArgumentException("La contraseña es obligatoria");
-        }
-        if (usuario.getEmail() == null || usuario.getEmail().trim().isEmpty()) {
-            throw new IllegalArgumentException("El email es obligatorio");
-        }
-        if (usuario.getRol() == null || usuario.getRol().trim().isEmpty()) {
-            throw new IllegalArgumentException("El rol es obligatorio");
         }
     }
 }
