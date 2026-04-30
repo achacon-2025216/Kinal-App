@@ -8,6 +8,14 @@
 </head>
 <body>
 
+<div class="container d-flex justify-content-end py-3">
+    <form th:action="@{/logout}" method="post">
+        <button type="submit" class="btn btn-danger shadow-sm">
+            <i class="bi bi-box-arrow-right"></i> Cerrar Sesión
+        </button>
+    </form>
+</div>
+
 <div class="container py-5">
     <header class="text-center mb-5">
         <h1 class="display-4 fw-bold text-primary">Sistema de Gestión Kinal</h1>

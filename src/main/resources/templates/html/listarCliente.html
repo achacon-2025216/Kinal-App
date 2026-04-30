@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Clientes - Kinal</title>
@@ -10,7 +11,8 @@
 <div class="container">
     <h2>Gestión de Clientes - Kinal</h2>
 
-    <div class="card-formulario">
+    <!-- BLOQUEO 1: Solo el ADMIN ve la tarjeta del formulario -->
+    <div class="card-formulario" sec:authorize="hasRole('ADMIN')">
         <h3 th:text="${clienteEditando?.dpiCliente != null} ? 'Editar Cliente' : 'Nuevo Cliente'"></h3>
 
         <form th:action="@{/clientes/guardar}" th:object="${clienteEditando}" method="post">
@@ -47,12 +49,6 @@
                        class="btn btn-eliminar">Cancelar</a>
                 </div>
             </div>
-
-            <hr>
-
-            <div style="text-align: center;">
-                <a th:href="@{/}" class="btn btn-editar">← Volver al Inicio de la App</a>
-            </div>
         </form>
     </div>
 
@@ -73,12 +69,21 @@
             <td th:text="${cliente.apellidoCliente}"></td>
             <td th:text="${cliente.direccion}"></td>
             <td>
-                <a th:href="@{/clientes/editar/{id}(id=${cliente.dpiCliente})}" class="btn btn-editar">Editar</a>
-                <a th:href="@{/clientes/eliminar/{id}(id=${cliente.dpiCliente})}" class="btn btn-eliminar">Eliminar</a>
+                <!-- BLOQUEO 2: Los botones de acción solo para ADMIN -->
+                <div sec:authorize="hasRole('ADMIN')">
+                    <a th:href="@{/clientes/editar/{id}(id=${cliente.dpiCliente})}" class="btn btn-editar">Editar</a>
+                    <a th:href="@{/clientes/eliminar/{id}(id=${cliente.dpiCliente})}" class="btn btn-eliminar">Eliminar</a>
+                </div>
+                <!-- Mensaje para usuarios normales -->
+                <span sec:authorize="hasRole('USER')" style="color: gray; font-style: italic;">Solo lectura</span>
             </td>
         </tr>
         </tbody>
     </table>
+
+    <div style="text-align: center; margin-top: 20px;">
+        <a th:href="@{/}" class="btn btn-editar">← Volver al Inicio de la App</a>
+    </div>
 </div>
 
 </body>
