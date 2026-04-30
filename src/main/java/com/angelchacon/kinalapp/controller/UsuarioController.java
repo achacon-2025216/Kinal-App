@@ -18,72 +18,69 @@ public class UsuarioController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // --- LISTAR USUARIOS ---
     @GetMapping("/usuarios")
     public String listar(Model model) {
         model.addAttribute("listaUsuarios", usuarioService.listarTodos());
-        model.addAttribute("usuarioEditando", new Usuario()); // Objeto vacío para el formulario de creación
+        model.addAttribute("usuarioEditando", new Usuario());
         return "html/listarUsuario";
     }
 
-    // --- GUARDAR O ACTUALIZAR ---
     @PostMapping("/usuarios/guardar")
-    public String guardar(@ModelAttribute("usuarioEditando") Usuario usuario) {
-        // 1. Verificamos si es un nuevo usuario o edición para manejar la contraseña
-        // Si es nuevo (codigo es null) o si la contraseña fue cambiada, la ciframos
-        if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
-            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+    public String guardar(@ModelAttribute("usuarioEditando") Usuario usuarioFormulario) {
+
+        // --- MODO EDICIÓN ---
+        if (usuarioFormulario.getCodigo() != null && usuarioFormulario.getCodigo() > 0) {
+            Usuario usuarioDB = usuarioService.buscarPorCodigo(usuarioFormulario.getCodigo()).orElse(null);
+
+            if (usuarioDB != null) {
+                // Sincronizamos campos usando los nombres correctos de tu Entidad
+                usuarioDB.setUsername(usuarioFormulario.getUsername()); // Cambiado de setNombre
+                usuarioDB.setEmail(usuarioFormulario.getEmail());
+                usuarioDB.setEstado(usuarioFormulario.getEstado());
+
+                // Manejo de roles
+                String rol = usuarioFormulario.getRol();
+                if (rol != null && !rol.startsWith("ROLE_")) {
+                    rol = "ROLE_" + rol;
+                }
+                usuarioDB.setRol(rol);
+
+                // Actualizar contraseña solo si se envió una nueva
+                if (usuarioFormulario.getPassword() != null && !usuarioFormulario.getPassword().isEmpty()) {
+                    usuarioDB.setPassword(passwordEncoder.encode(usuarioFormulario.getPassword()));
+                }
+
+                usuarioService.guardar(usuarioDB);
+                return "redirect:/usuarios";
+            }
         }
 
-        // 2. Aseguramos el prefijo de rol para Spring Security
-        if (usuario.getRol() != null && !usuario.getRol().startsWith("ROLE_")) {
-            usuario.setRol("ROLE_" + usuario.getRol());
+        // --- MODO NUEVO (AUTO-INCREMENTO) ---
+        // Al no entrar al IF anterior, el 'codigo' permanece null y la DB lo autoincrementa
+        usuarioFormulario.setPassword(passwordEncoder.encode(usuarioFormulario.getPassword()));
+
+        if (usuarioFormulario.getRol() != null && !usuarioFormulario.getRol().startsWith("ROLE_")) {
+            usuarioFormulario.setRol("ROLE_" + usuarioFormulario.getRol());
         }
 
-        usuarioService.guardar(usuario);
+        usuarioService.guardar(usuarioFormulario);
         return "redirect:/usuarios";
     }
 
-    /// --- EDITAR USUARIO ---
     @GetMapping("/usuarios/editar/{codigo}")
-    public String editar(@PathVariable("codigo") Integer codigo, Model model) { // Cambiado a Integer
-        // Usamos el nombre exacto de tu interfaz: buscarPorCodigo
-        // Como devuelve un Optional, usamos .orElse(null)
+    public String editar(@PathVariable("codigo") Integer codigo, Model model) {
         Usuario usuario = usuarioService.buscarPorCodigo(codigo).orElse(null);
-
         if (usuario != null) {
             model.addAttribute("usuarioEditando", usuario);
             model.addAttribute("listaUsuarios", usuarioService.listarTodos());
             return "html/listarUsuario";
         }
-
         return "redirect:/usuarios?error=notfound";
     }
 
-    // --- ELIMINAR USUARIO ---
     @GetMapping("/usuarios/eliminar/{codigo}")
-    public String eliminar(@PathVariable("codigo") Integer codigo) { // Cambiado a Integer
+    public String eliminar(@PathVariable("codigo") Integer codigo) {
         usuarioService.eliminar(codigo);
         return "redirect:/usuarios";
-    }
-
-    // --- REGISTRO PÚBLICO ---
-    @GetMapping("/registro")
-    public String mostrarRegistro(Model model) {
-        model.addAttribute("usuarioNuevo", new Usuario());
-        return "html/registro";
-    }
-
-    @PostMapping("/registro/guardar")
-    public String registrar(@ModelAttribute("usuarioNuevo") Usuario usuario) {
-        // Cifrar contraseña antes de guardar
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-
-        if (!usuario.getRol().startsWith("ROLE_")) {
-            usuario.setRol("ROLE_" + usuario.getRol());
-        }
-
-        usuarioService.guardar(usuario);
-        return "redirect:/login?success";
     }
 }
