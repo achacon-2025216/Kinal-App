@@ -18,44 +18,72 @@ public class UsuarioController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // --- RUTAS DE GESTIÓN (Mantenlas si las usas) ---
-
+    // --- LISTAR USUARIOS ---
     @GetMapping("/usuarios")
     public String listar(Model model) {
         model.addAttribute("listaUsuarios", usuarioService.listarTodos());
-        model.addAttribute("usuarioEditando", new Usuario());
+        model.addAttribute("usuarioEditando", new Usuario()); // Objeto vacío para el formulario de creación
         return "html/listarUsuario";
     }
 
+    // --- GUARDAR O ACTUALIZAR ---
     @PostMapping("/usuarios/guardar")
     public String guardar(@ModelAttribute("usuarioEditando") Usuario usuario) {
+        // 1. Verificamos si es un nuevo usuario o edición para manejar la contraseña
+        // Si es nuevo (codigo es null) o si la contraseña fue cambiada, la ciframos
+        if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
+            usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+        }
+
+        // 2. Aseguramos el prefijo de rol para Spring Security
+        if (usuario.getRol() != null && !usuario.getRol().startsWith("ROLE_")) {
+            usuario.setRol("ROLE_" + usuario.getRol());
+        }
+
         usuarioService.guardar(usuario);
         return "redirect:/usuarios";
     }
 
-    // --- RUTAS DE AUTENTICACIÓN ---
+    /// --- EDITAR USUARIO ---
+    @GetMapping("/usuarios/editar/{codigo}")
+    public String editar(@PathVariable("codigo") Integer codigo, Model model) { // Cambiado a Integer
+        // Usamos el nombre exacto de tu interfaz: buscarPorCodigo
+        // Como devuelve un Optional, usamos .orElse(null)
+        Usuario usuario = usuarioService.buscarPorCodigo(codigo).orElse(null);
 
-    // 1. ELIMINA mostrarLogin() -> Ya lo hace el IndexController
-    // 2. ELIMINA login(...) -> Spring Security lo hace internamente
-    // 3. ELIMINA logout(...) -> Spring Security lo hace internamente
+        if (usuario != null) {
+            model.addAttribute("usuarioEditando", usuario);
+            model.addAttribute("listaUsuarios", usuarioService.listarTodos());
+            return "html/listarUsuario";
+        }
 
+        return "redirect:/usuarios?error=notfound";
+    }
+
+    // --- ELIMINAR USUARIO ---
+    @GetMapping("/usuarios/eliminar/{codigo}")
+    public String eliminar(@PathVariable("codigo") Integer codigo) { // Cambiado a Integer
+        usuarioService.eliminar(codigo);
+        return "redirect:/usuarios";
+    }
+
+    // --- REGISTRO PÚBLICO ---
     @GetMapping("/registro")
     public String mostrarRegistro(Model model) {
         model.addAttribute("usuarioNuevo", new Usuario());
         return "html/registro";
     }
 
-    
     @PostMapping("/registro/guardar")
-    public String registrar(@ModelAttribute("usuario") Usuario usuario) {
-        // 1. Forzamos el prefijo ROLE_ para que Spring Security lo reconozca
+    public String registrar(@ModelAttribute("usuarioNuevo") Usuario usuario) {
+        // Cifrar contraseña antes de guardar
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+
         if (!usuario.getRol().startsWith("ROLE_")) {
             usuario.setRol("ROLE_" + usuario.getRol());
         }
 
-        // 2. Guardamos (Asegúrate de que tu servicio use el repositorio de MySQL)
         usuarioService.guardar(usuario);
-
         return "redirect:/login?success";
     }
 }

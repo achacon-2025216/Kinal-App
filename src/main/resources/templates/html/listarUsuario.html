@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Gestión de Usuarios - Kinal</title>
@@ -10,15 +11,18 @@
 <div class="container">
     <h2>Gestión de Usuarios - Kinal</h2>
 
-    <div class="card-formulario">
-        <h3 th:text="${usuarioEditando?.codigo != null} ? 'Editar Usuario' : 'Nuevo Usuario'"></h3>
+    <!-- BLOQUEO: Solo el ADMIN puede ver y usar el formulario -->
+    <div class="card-formulario" sec:authorize="hasRole('ADMIN')">
+        <!-- Verificamos si existe el código para cambiar el título -->
+        <h3 th:text="${usuarioEditando.codigo != null} ? 'Editar Usuario' : 'Nuevo Usuario'"></h3>
 
         <form th:action="@{/usuarios/guardar}" th:object="${usuarioEditando}" method="post">
             <div class="form-row">
                 <div class="form-group">
                     <label>Código:</label>
+                    <!-- El ID debe ser enviado, pero si es edición lo ponemos readonly -->
                     <input type="number" th:field="*{codigo}"
-                           th:readonly="${usuarioEditando?.codigo != null}"
+                           th:readonly="${usuarioEditando.codigo != null}"
                            class="form-control" required />
                 </div>
 
@@ -34,7 +38,10 @@
 
                 <div class="form-group">
                     <label>Password:</label>
-                    <input type="password" th:field="*{password}" class="form-control" required />
+                    <!-- En edición, podrías dejar el password vacío o manejarlo en el service -->
+                    <input type="password" th:field="*{password}" class="form-control"
+                           th:required="${usuarioEditando.codigo == null}"
+                           placeholder="Nueva contraseña o actual" />
                 </div>
 
                 <div class="form-group">
@@ -53,11 +60,11 @@
                     </select>
                 </div>
 
-                <div class="form-group">
+                <div class="form-group" style="margin-top: 20px;">
                     <button type="submit" class="btn btn-nuevo">
-                        <span th:text="${usuarioEditando?.codigo != null} ? 'Actualizar' : 'Guardar'"></span>
+                        <span th:text="${usuarioEditando.codigo != null} ? 'Actualizar' : 'Guardar'"></span>
                     </button>
-                    <a th:if="${usuarioEditando?.codigo != null}" th:href="@{/usuarios}" class="btn btn-eliminar">Cancelar</a>
+                    <a th:if="${usuarioEditando.codigo != null}" th:href="@{/usuarios}" class="btn btn-eliminar">Cancelar</a>
                 </div>
             </div>
             <hr>
@@ -67,6 +74,11 @@
         </form>
     </div>
 
+    <!-- Botón volver para USER -->
+    <div style="margin-bottom: 20px;" sec:authorize="hasRole('USER')">
+        <a th:href="@{/}" class="btn btn-editar">← Volver al Inicio</a>
+    </div>
+
     <table class="tabla-clientes">
         <thead>
         <tr>
@@ -74,7 +86,7 @@
             <th>Username</th>
             <th>Email</th>
             <th>Rol</th>
-            <th>Acciones</th>
+            <th sec:authorize="hasRole('ADMIN')">Acciones</th>
         </tr>
         </thead>
         <tbody>
@@ -83,9 +95,10 @@
             <td th:text="${user.username}"></td>
             <td th:text="${user.email}"></td>
             <td th:text="${user.rol}"></td>
-            <td>
+            <td sec:authorize="hasRole('ADMIN')">
                 <a th:href="@{/usuarios/editar/{id}(id=${user.codigo})}" class="btn btn-editar">Editar</a>
-                <a th:href="@{/usuarios/eliminar/{id}(id=${user.codigo})}" class="btn btn-eliminar">Eliminar</a>
+                <a th:href="@{/usuarios/eliminar/{id}(id=${user.codigo})}" class="btn btn-eliminar"
+                   onclick="return confirm('¿Deseas eliminar este usuario?')">Eliminar</a>
             </td>
         </tr>
         </tbody>
