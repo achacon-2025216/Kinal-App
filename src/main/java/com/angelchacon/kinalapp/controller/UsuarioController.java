@@ -45,18 +45,17 @@ public class UsuarioController {
         return "html/registro";
     }
 
+    
     @PostMapping("/registro/guardar")
-    public String registrarNuevo(@ModelAttribute("usuarioNuevo") Usuario usuario) {
-        // 1. Encriptar la contraseña (lo que ya hicimos)
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-
-        // 2. AGREGAR EL PREFIJO ROLE_ (Esto es lo que te falta)
-        // Si el usuario eligió "ADMIN", esto lo convierte en "ROLE_ADMIN"
+    public String registrar(@ModelAttribute("usuario") Usuario usuario) {
+        // 1. Forzamos el prefijo ROLE_ para que Spring Security lo reconozca
         if (!usuario.getRol().startsWith("ROLE_")) {
             usuario.setRol("ROLE_" + usuario.getRol());
         }
 
+        // 2. Guardamos (Asegúrate de que tu servicio use el repositorio de MySQL)
         usuarioService.guardar(usuario);
-        return "redirect:/login?success=true";
+
+        return "redirect:/login?success";
     }
 }
