@@ -27,6 +27,19 @@ header p {
     margin-bottom: 40px;
 }
 
+/* Estilo del botón de Cerrar Sesión */
+.btn-danger {
+    background-color: #dc3545;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espacio entre el icono y el texto */
+}
+
 /* Cuadrícula de tarjetas */
 .grid-cards {
     display: grid;
