@@ -2,23 +2,23 @@ package com.angelchacon.kinalapp.controller;
 
 import com.angelchacon.kinalapp.entity.Usuario;
 import com.angelchacon.kinalapp.service.IUsuarioService;
-import jakarta.servlet.http.HttpSession;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @Controller
 public class UsuarioController {
 
     private final IUsuarioService usuarioService;
+    private final PasswordEncoder passwordEncoder;
 
-    public UsuarioController(IUsuarioService usuarioService) {
+    public UsuarioController(IUsuarioService usuarioService, PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // --- RUTAS DE GESTIÓN (CON PREFIJO) ---
+    // --- RUTAS DE GESTIÓN (Mantenlas si las usas) ---
 
     @GetMapping("/usuarios")
     public String listar(Model model) {
@@ -33,38 +33,11 @@ public class UsuarioController {
         return "redirect:/usuarios";
     }
 
-    @GetMapping("/usuarios/editar/{codigo}")
-    public String editar(@PathVariable Integer codigo, Model model) {
-        model.addAttribute("listaUsuarios", usuarioService.listarTodos());
-        model.addAttribute("usuarioEditando", usuarioService.buscarPorCodigo(codigo).orElse(new Usuario()));
-        return "html/listarUsuario";
-    }
+    // --- RUTAS DE AUTENTICACIÓN ---
 
-    @GetMapping("/usuarios/eliminar/{codigo}")
-    public String eliminar(@PathVariable Integer codigo) {
-        usuarioService.eliminar(codigo);
-        return "redirect:/usuarios";
-    }
-
-    // --- RUTAS DE AUTENTICACIÓN (LIMPIAS) ---
-
-    @GetMapping("/login")
-    public String mostrarLogin() {
-        return "html/login";
-    }
-
-    @PostMapping("/login/entrar")
-    public String login(@RequestParam String username, @RequestParam String password, HttpSession session) {
-        Optional<Usuario> usuarioEncontrado = usuarioService.listarTodos().stream()
-                .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
-                .findFirst();
-
-        if (usuarioEncontrado.isPresent()) {
-            session.setAttribute("usuarioActivo", usuarioEncontrado.get());
-            return "redirect:/";
-        }
-        return "redirect:/login?error=true";
-    }
+    // 1. ELIMINA mostrarLogin() -> Ya lo hace el IndexController
+    // 2. ELIMINA login(...) -> Spring Security lo hace internamente
+    // 3. ELIMINA logout(...) -> Spring Security lo hace internamente
 
     @GetMapping("/registro")
     public String mostrarRegistro(Model model) {
@@ -74,13 +47,16 @@ public class UsuarioController {
 
     @PostMapping("/registro/guardar")
     public String registrarNuevo(@ModelAttribute("usuarioNuevo") Usuario usuario) {
+        // 1. Encriptar la contraseña (lo que ya hicimos)
+        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
+
+        // 2. AGREGAR EL PREFIJO ROLE_ (Esto es lo que te falta)
+        // Si el usuario eligió "ADMIN", esto lo convierte en "ROLE_ADMIN"
+        if (!usuario.getRol().startsWith("ROLE_")) {
+            usuario.setRol("ROLE_" + usuario.getRol());
+        }
+
         usuarioService.guardar(usuario);
         return "redirect:/login?success=true";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login";
     }
 }

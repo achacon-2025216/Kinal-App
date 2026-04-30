@@ -10,11 +10,11 @@ public class index {
     @GetMapping("/")
     public String home(Model model) {
         model.addAttribute("successmessage", "Bienvenido al Sistema Kinal-App");
-        return "principal";
+        return "index";
     }
 
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "html/login";
     }
 }
