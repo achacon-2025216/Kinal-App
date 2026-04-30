@@ -1,19 +1,20 @@
 package com.angelchacon.kinalapp.controller;
 
-import jakarta.servlet.http.HttpSession;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
-public class index {
+public class IndexController {
 
     @GetMapping("/")
-    public String home(HttpSession session) {
-        if (session.getAttribute("usuarioActivo") == null) {
-            return "redirect:/login";
-        }
-        return "index";
+    public String home(Model model) {
+        model.addAttribute("successmessage", "Bienvenido al Sistema Kinal-App");
+        return "principal";
     }
 
-
+    @GetMapping("/login")
+    public String login() {
+        return "login";
+    }
 }

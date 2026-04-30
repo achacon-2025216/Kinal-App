@@ -71,6 +71,12 @@
         <artifactId>thymeleaf-extras-springsecurity6</artifactId>
     </dependency>
 
+        <!-- Motor principal de Spring Security -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+
 	</dependencies>
     
 	<build>
