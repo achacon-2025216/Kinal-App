@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Kinal App - Inventario de Productos</title>
@@ -16,7 +17,8 @@
     </header>
 
     <div class="row g-4">
-        <div class="col-lg-4">
+        <!-- BLOQUEO 1: El formulario solo es visible para ADMIN -->
+        <div class="col-lg-4" sec:authorize="hasRole('ADMIN')">
             <div class="card border-0 shadow-sm p-4 form-card">
                 <h3 class="mb-4" style="color: #141A3D;"
                     th:text="${productoEditando.codigoProducto != null} ? 'Editar Producto' : 'Nuevo Producto'">
@@ -66,9 +68,17 @@
             </div>
         </div>
 
-        <div class="col-lg-8">
+        <!-- Ajuste de columna: col-lg-8 si hay form (admin), col-lg-12 si no lo hay (user) -->
+        <div th:class="${#authorization.expression('hasRole(''ADMIN'')')} ? 'col-lg-8' : 'col-lg-12'">
             <div class="card border-0 shadow-sm p-4">
-                <h3 class="mb-4" style="color: #141A3D;">Inventario Actual</h3>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h3 style="color: #141A3D; margin: 0;">Inventario Actual</h3>
+                    <!-- Botón volver visible para USER (ya que el del form desaparece) -->
+                    <a th:href="@{/}" class="btn btn-sm btn-outline-secondary" sec:authorize="hasRole('USER')">
+                        <i class="bi bi-arrow-left"></i> Menú Principal
+                    </a>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
@@ -77,7 +87,8 @@
                             <th>Nombre</th>
                             <th>Precio</th>
                             <th>Stock</th>
-                            <th class="text-center">Acciones</th>
+                            <!-- BLOQUEO 2: Encabezado de acciones solo para ADMIN -->
+                            <th class="text-center" sec:authorize="hasRole('ADMIN')">Acciones</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -89,7 +100,8 @@
                                 <span th:class="${p.stock < 10} ? 'badge bg-danger' : 'badge bg-success'"
                                       th:text="${p.stock}"></span>
                             </td>
-                            <td class="text-center">
+                            <!-- BLOQUEO 3: Botones de editar/eliminar solo para ADMIN -->
+                            <td class="text-center" sec:authorize="hasRole('ADMIN')">
                                 <a th:href="@{/productos/editar/{id}(id=${p.codigoProducto})}"
                                    class="btn btn-outline-warning btn-sm me-1">
                                     <i class="bi bi-pencil-square"></i>
