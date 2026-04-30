@@ -19,24 +19,14 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth
-                        // Recursos estáticos libres
-                        .requestMatchers("/css/**", "/js/**", "/login").permitAll()
-
-                        // --- RESTRICCIONES POR ROL ---
-                        // Solo ADMIN puede crear, editar, guardar o eliminar
-                        .requestMatchers("/clientes/nuevo/**", "/clientes/editar/**",
-                                "/clientes/eliminar/**", "/clientes/guardar/**",
-                                "/clientes/cambiar-estado/**").hasRole("ADMIN")
-
-                        // USER y ADMIN pueden ver la lista y los detalles
-                        .requestMatchers("/clientes", "/clientes/ver/**").hasAnyRole("USER", "ADMIN")
-
+                .authorizeHttpRequests((requests) -> requests
+                        // Agregamos /registro a las rutas permitidas sin loguearse
+                        .requestMatchers("/login", "/registro", "/css/**", "/js/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/", true)
+                        .defaultSuccessUrl("/principal", true) // Esto busca la RUTA /principal, no el archivo
                         .permitAll()
                 )
                 .logout(logout -> logout
