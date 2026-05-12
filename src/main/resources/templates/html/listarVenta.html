@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"> <!-- Importante: añadir seguridad -->
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Kinal App - Gestión de Ventas</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/listarVenta.css}">
+    <style>
+        body { background-color: #f8f9fa; }
+        .card { border-radius: 15px; border: none; }
+        .table thead { background-color: #141A3D; color: white; }
+    </style>
 </head>
 <body>
 
@@ -17,9 +21,9 @@
     </header>
 
     <div class="row g-4">
-        <!-- BLOQUEO 1: El formulario de registro/edición solo es para ADMIN -->
+
         <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
-            <div class="card shadow-sm border-0 p-4" style="border-radius: 15px;">
+            <div class="card shadow-sm p-4">
                 <h2 style="color: #141A3D; font-size: 1.5rem;" class="mb-4"
                     th:text="${ventaEditando.codigoVenta != null} ? 'Editar Venta' : 'Nueva Venta'">
                     Nueva Venta
@@ -27,11 +31,6 @@
 
                 <form th:action="@{/ventas/guardar}" th:object="${ventaEditando}" method="post">
                     <input type="hidden" th:field="*{codigoVenta}">
-
-                    <div class="mb-3" th:if="${ventaEditando.codigoVenta == null}">
-                        <label class="form-label fw-bold">Código Venta</label>
-                        <input type="number" th:field="*{codigoVenta}" class="form-control" placeholder="ID Venta" required>
-                    </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Fecha</label>
@@ -54,7 +53,7 @@
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Vendedor (Usuario)</label>
+                        <label class="form-label fw-bold">Vendedor</label>
                         <select th:field="*{usuario.codigo}" class="form-select" required>
                             <option value="" disabled selected>--- Seleccione Vendedor ---</option>
                             <option th:each="u : ${listaUsuarios}"
@@ -63,60 +62,45 @@
                         </select>
                     </div>
 
-                    <div class="d-grid gap-2 mt-4">
-                        <button type="submit" class="btn text-white" style="background-color: #141A3D; border-radius: 8px;">
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn text-white" style="background-color: #141A3D;">
                             <i class="bi bi-save"></i>
-                            <span th:text="${ventaEditando.codigoVenta != null} ? ' Actualizar Venta' : ' Registrar Venta'"></span>
+                            <span th:text="${ventaEditando.codigoVenta != null} ? ' Actualizar' : ' Registrar'"></span>
                         </button>
-
-                        <a th:href="@{/ventas}" class="btn btn-light border mt-2" th:if="${ventaEditando.codigoVenta != null}">
-                            Cancelar Edición
-                        </a>
-
-                        <a th:href="@{/}" class="btn btn-light border mt-2">
-                            <i class="bi bi-house"></i> Volver al Inicio
-                        </a>
+                        <a th:href="@{/ventas}" class="btn btn-light border" th:if="${ventaEditando.codigoVenta != null}">Cancelar</a>
+                        <a th:href="@{/}" class="btn btn-outline-secondary"><i class="bi bi-house"></i> Inicio</a>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Si es USER, la tabla ocupará todo el ancho (col-md-12), si es ADMIN ocupa col-md-8 -->
         <div th:class="${#authorization.expression('hasRole(''ADMIN'')')} ? 'col-md-8' : 'col-md-12'">
-            <div class="card shadow-sm border-0 p-4" style="border-radius: 15px;">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h2 style="color: #141A3D; font-size: 1.5rem;" class="mb-0">Historial de Ventas</h2>
-                    <!-- Botón de volver para el USER (ya que no ve el formulario) -->
-                    <a th:href="@{/}" class="btn btn-outline-secondary btn-sm" sec:authorize="hasRole('USER')">
-                        <i class="bi bi-house"></i> Inicio
-                    </a>
-                </div>
+            <div class="card shadow-sm p-4">
+                <h2 style="color: #141A3D; font-size: 1.5rem;" class="mb-4">Historial de Ventas</h2>
 
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead style="background-color: #141A3D; color: white;">
+                        <thead>
                         <tr>
-                            <th class="py-3 px-3" style="border-top-left-radius: 10px;">ID</th>
-                            <th class="py-3">Fecha</th>
-                            <th class="py-3">Cliente</th>
-                            <th class="py-3">Total</th>
-                            <!-- BLOQUEO 2: Encabezado de acciones solo para ADMIN -->
-                            <th class="py-3 px-3" style="border-top-right-radius: 10px;" sec:authorize="hasRole('ADMIN')">Acciones</th>
+                            <th class="px-3">ID</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th class="text-center" sec:authorize="hasRole('ADMIN')">Acciones</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="v : ${listaVentas}">
                             <td class="px-3" th:text="${v.codigoVenta}"></td>
                             <td th:text="${v.fechaVenta}"></td>
-                            <td th:text="${v.cliente.nombreCliente}"></td>
-                            <td class="fw-bold text-success" th:text="'Q' + ${v.total}"></td>
-                            <!-- BLOQUEO 3: Botones de editar/eliminar solo para ADMIN -->
-                            <td class="px-3" sec:authorize="hasRole('ADMIN')">
-                                <a th:href="@{/ventas/editar/{id}(id=${v.codigoVenta})}" class="btn btn-sm btn-outline-warning me-1">
+                            <td th:text="${v.cliente != null ? v.cliente.nombreCliente : 'N/A'}"></td>
+                            <td class="fw-bold text-success" th:text="${v.total != null ? 'Q' + v.total : 'Q0.00'}"></td>
+                            <td class="text-center" sec:authorize="hasRole('ADMIN')">
+                                <a th:href="@{/ventas/editar/{id}(id=${v.codigoVenta})}" class="btn btn-sm btn-warning">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
-                                <a th:href="@{/ventas/eliminar/{id}(id=${v.codigoVenta})}" class="btn btn-sm btn-outline-danger"
-                                   onclick="return confirm('¿Seguro que quieres eliminar esta venta?')">
+                                <a th:href="@{/ventas/eliminar/{id}(id=${v.codigoVenta})}" class="btn btn-sm btn-danger"
+                                   onclick="return confirm('¿Eliminar esta venta?')">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </td>
@@ -124,13 +108,12 @@
                         </tbody>
                     </table>
                 </div>
+
                 <div th:if="${#lists.isEmpty(listaVentas)}" class="alert alert-info text-center">
-                    No hay ventas registradas actualmente.
+                    No hay ventas registradas.
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-</body>
+    </div> </div> </body>
 </html>
