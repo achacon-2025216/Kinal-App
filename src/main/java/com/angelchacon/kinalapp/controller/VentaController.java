@@ -43,7 +43,7 @@ public class VentaController {
 
     // GUARDAR O ACTUALIZAR (Spring detecta el ID automáticamente)
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute Venta venta) {
+    public String guardar(@ModelAttribute("ventaEditando") Venta venta) {
         ventaService.guardar(venta);
         return "redirect:/ventas";
     }
