@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Table(name = "ventas")
 public class Venta {
     
-    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private java.util.List<DetalleVenta> detalles;
 
     @Id
