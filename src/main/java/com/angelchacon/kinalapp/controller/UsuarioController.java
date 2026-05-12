@@ -28,24 +28,24 @@ public class UsuarioController {
     @PostMapping("/usuarios/guardar")
     public String guardar(@ModelAttribute("usuarioEditando") Usuario usuarioFormulario) {
 
-        // --- MODO EDICIÓN ---
+        // 1. DETERMINAR SI ES EDICIÓN O CREACIÓN
         if (usuarioFormulario.getCodigo() != null && usuarioFormulario.getCodigo() > 0) {
+            // --- MODO EDICIÓN ---
             Usuario usuarioDB = usuarioService.buscarPorCodigo(usuarioFormulario.getCodigo()).orElse(null);
 
             if (usuarioDB != null) {
-                // Sincronizamos campos usando los nombres correctos de tu Entidad
-                usuarioDB.setUsername(usuarioFormulario.getUsername()); // Cambiado de setNombre
+                usuarioDB.setUsername(usuarioFormulario.getUsername());
                 usuarioDB.setEmail(usuarioFormulario.getEmail());
                 usuarioDB.setEstado(usuarioFormulario.getEstado());
 
-                // Manejo de roles
+                // Roles
                 String rol = usuarioFormulario.getRol();
                 if (rol != null && !rol.startsWith("ROLE_")) {
                     rol = "ROLE_" + rol;
                 }
                 usuarioDB.setRol(rol);
 
-                // Actualizar contraseña solo si se envió una nueva
+                // Solo encriptar si el usuario escribió algo en el campo de password
                 if (usuarioFormulario.getPassword() != null && !usuarioFormulario.getPassword().isEmpty()) {
                     usuarioDB.setPassword(passwordEncoder.encode(usuarioFormulario.getPassword()));
                 }
@@ -55,17 +55,26 @@ public class UsuarioController {
             }
         }
 
-        // --- MODO NUEVO (AUTO-INCREMENTO) ---
-        // Al no entrar al IF anterior, el 'codigo' permanece null y la DB lo autoincrementa
-        usuarioFormulario.setPassword(passwordEncoder.encode(usuarioFormulario.getPassword()));
+        // --- MODO NUEVO ---
+        // Si no entró al IF de arriba, es un registro nuevo.
+        // Forzamos el código a null para que MySQL use AUTO_INCREMENT y evitar el error de StaleObject
+        usuarioFormulario.setCodigo(null);
 
-        if (usuarioFormulario.getRol() != null && !usuarioFormulario.getRol().startsWith("ROLE_")) {
-            usuarioFormulario.setRol("ROLE_" + usuarioFormulario.getRol());
+        // Encriptar siempre porque es usuario nuevo
+        if (usuarioFormulario.getPassword() != null && !usuarioFormulario.getPassword().isEmpty()) {
+            usuarioFormulario.setPassword(passwordEncoder.encode(usuarioFormulario.getPassword()));
+        }
+
+        // Formatear rol
+        String rolNuevo = usuarioFormulario.getRol();
+        if (rolNuevo != null && !rolNuevo.startsWith("ROLE_")) {
+            usuarioFormulario.setRol("ROLE_" + rolNuevo);
         }
 
         usuarioService.guardar(usuarioFormulario);
         return "redirect:/usuarios";
     }
+
 
     @GetMapping("/usuarios/editar/{codigo}")
     public String editar(@PathVariable("codigo") Integer codigo, Model model) {
