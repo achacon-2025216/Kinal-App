@@ -11,8 +11,8 @@
 <div class="container">
     <h2>Gestión de Clientes - Kinal</h2>
 
-    <!-- BLOQUEO 1: Solo el ADMIN ve la tarjeta del formulario -->
-    <div class="card-formulario" sec:authorize="hasRole('ADMIN')">
+    <!-- CAMBIO 1: Ahora USER y ADMIN pueden ver el formulario para AGREGAR -->
+    <div class="card-formulario" sec:authorize="hasAnyRole('USER', 'ADMIN')">
         <h3 th:text="${clienteEditando?.dpiCliente != null} ? 'Editar Cliente' : 'Nuevo Cliente'"></h3>
 
         <form th:action="@{/clientes/guardar}" th:object="${clienteEditando}" method="post">
@@ -23,30 +23,26 @@
                            th:readonly="${clienteEditando?.dpiCliente != null}"
                            class="form-control" required />
                 </div>
-
                 <div class="form-group">
                     <label>Nombre:</label>
                     <input type="text" th:field="*{nombreCliente}" class="form-control" required />
                 </div>
-
                 <div class="form-group">
                     <label>Apellido:</label>
                     <input type="text" th:field="*{apellidoCliente}" class="form-control" required />
                 </div>
-
                 <div class="form-group">
                     <label>Dirección:</label>
                     <input type="text" th:field="*{direccion}" class="form-control" required />
                 </div>
 
                 <div class="form-group">
+                    <!-- El botón de enviar ahora es visible para ambos -->
                     <button type="submit" class="btn btn-nuevo">
                         <span th:text="${clienteEditando?.dpiCliente != null} ? 'Actualizar' : 'Guardar'"></span>
                     </button>
 
-                    <a th:if="${clienteEditando?.dpiCliente != null}"
-                       th:href="@{/clientes}"
-                       class="btn btn-eliminar">Cancelar</a>
+                    <a th:if="${clienteEditando?.dpiCliente != null}" th:href="@{/clientes}" class="btn btn-eliminar">Cancelar</a>
                 </div>
             </div>
         </form>
@@ -69,13 +65,14 @@
             <td th:text="${cliente.apellidoCliente}"></td>
             <td th:text="${cliente.direccion}"></td>
             <td>
-                <!-- BLOQUEO 2: Los botones de acción solo para ADMIN -->
+                <!-- CAMBIO 2: Solo ADMIN puede ver Editar y Eliminar -->
                 <div sec:authorize="hasRole('ADMIN')">
                     <a th:href="@{/clientes/editar/{id}(id=${cliente.dpiCliente})}" class="btn btn-editar">Editar</a>
                     <a th:href="@{/clientes/eliminar/{id}(id=${cliente.dpiCliente})}" class="btn btn-eliminar">Eliminar</a>
                 </div>
-                <!-- Mensaje para usuarios normales -->
-                <span sec:authorize="hasRole('USER')" style="color: gray; font-style: italic;">Solo lectura</span>
+
+                <!-- El USER verá este mensaje en la columna de acciones -->
+                <span sec:authorize="hasRole('USER')" style="color: gray; font-style: italic;">Sin permisos de edición</span>
             </td>
         </tr>
         </tbody>
@@ -85,6 +82,5 @@
         <a th:href="@{/}" class="btn btn-editar">← Volver al Inicio de la App</a>
     </div>
 </div>
-
 </body>
 </html>
