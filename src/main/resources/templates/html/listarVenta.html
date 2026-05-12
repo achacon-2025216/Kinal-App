@@ -10,6 +10,8 @@
         body { background-color: #f8f9fa; }
         .card { border-radius: 15px; border: none; }
         .table thead { background-color: #141A3D; color: white; }
+        .btn-kinal { background-color: #141A3D; color: white; }
+        .btn-kinal:hover { background-color: #0d122b; color: white; }
     </style>
 </head>
 <body>
@@ -20,8 +22,28 @@
         <p class="text-muted">Registro de transacciones comerciales - Fundación Kinal</p>
     </header>
 
-    <div class="row g-4">
+    <!-- BARRA DE BÚSQUEDA (Solo Admin) -->
+    <div class="row mb-4" sec:authorize="hasRole('ADMIN')">
+        <div class="col-12">
+            <div class="card shadow-sm p-3">
+                <form th:action="@{/ventas/buscar}" method="get" class="row g-3 align-items-center">
+                    <div class="col-auto">
+                        <label class="fw-bold"><i class="bi bi-search"></i> Buscar Venta:</label>
+                    </div>
+                    <div class="col-md-5">
+                        <input type="text" name="termino" class="form-control" placeholder="Nombre del cliente o ID de venta...">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-kinal">Filtrar</button>
+                        <a th:href="@{/ventas}" class="btn btn-outline-secondary">Limpiar</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
+    <div class="row g-4">
+        <!-- FORMULARIO (ADMIN) -->
         <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card shadow-sm p-4">
                 <h2 style="color: #141A3D; font-size: 1.5rem;" class="mb-4"
@@ -63,7 +85,7 @@
                     </div>
 
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn text-white" style="background-color: #141A3D;">
+                        <button type="submit" class="btn btn-kinal">
                             <i class="bi bi-save"></i>
                             <span th:text="${ventaEditando.codigoVenta != null} ? ' Actualizar' : ' Registrar'"></span>
                         </button>
@@ -74,6 +96,7 @@
             </div>
         </div>
 
+        <!-- TABLA DE RESULTADOS -->
         <div th:class="${#authorization.expression('hasRole(''ADMIN'')')} ? 'col-md-8' : 'col-md-12'">
             <div class="card shadow-sm p-4">
                 <h2 style="color: #141A3D; font-size: 1.5rem;" class="mb-4">Historial de Ventas</h2>
@@ -110,10 +133,11 @@
                 </div>
 
                 <div th:if="${#lists.isEmpty(listaVentas)}" class="alert alert-info text-center">
-                    No hay ventas registradas.
+                    No se encontraron registros que coincidan con la búsqueda.
                 </div>
             </div>
         </div>
-
-    </div> </div> </body>
+    </div>
+</div>
+</body>
 </html>

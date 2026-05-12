@@ -9,7 +9,6 @@ import com.angelchacon.kinalapp.service.IVentaService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
@@ -41,20 +40,40 @@ public class VentaController {
         return "html/listarVenta";
     }
 
-    // GUARDAR O ACTUALIZAR (Spring detecta el ID automáticamente)
+    // NUEVO: BUSCAR VENTAS
+    @GetMapping("/buscar")
+    public String buscar(@RequestParam(value = "termino", required = false) String termino, Model model) {
+        List<Venta> resultados;
+
+        if (termino != null && !termino.trim().isEmpty()) {
+            resultados = ventaService.buscarVentas(termino.trim());
+        } else {
+            return "redirect:/ventas";
+        }
+
+        Venta nuevaVenta = new Venta();
+        nuevaVenta.setCliente(new Cliente());
+        nuevaVenta.setUsuario(new Usuario());
+
+        model.addAttribute("ventaEditando", nuevaVenta);
+        model.addAttribute("listaVentas", resultados);
+        model.addAttribute("listaClientes", clienteService.listarTodos());
+        model.addAttribute("listaUsuarios", usuarioService.listarTodos());
+        return "html/listarVenta";
+    }
+
+    // GUARDAR O ACTUALIZAR
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute("ventaEditando") Venta venta) {
         ventaService.guardar(venta);
         return "redirect:/ventas";
     }
 
-    // EDITAR (Carga los datos de una venta específica en el formulario)
+    // EDITAR
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Integer id, Model model) {
-        // Buscamos la venta por su ID
         Venta v = ventaService.buscarPorCodigo(id).orElse(new Venta());
 
-        // Si la venta existe pero los objetos internos son null, los inicializamos
         if (v.getCliente() == null) v.setCliente(new Cliente());
         if (v.getUsuario() == null) v.setUsuario(new Usuario());
 
