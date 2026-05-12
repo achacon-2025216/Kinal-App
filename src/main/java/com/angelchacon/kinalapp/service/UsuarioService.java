@@ -12,11 +12,18 @@ import java.util.Optional;
 @Transactional
 public class UsuarioService implements IUsuarioService {
 
-    // Repositorio que maneja los datos de Usuario
     private final UsuarioRepository usuarioRepository;
 
     public UsuarioService(UsuarioRepository usuarioRepository) {
         this.usuarioRepository = usuarioRepository;
+    }
+
+    // --- IMPLEMENTACIÓN DEL BUSCADOR ---
+    @Override
+    @Transactional(readOnly = true)
+    public List<Usuario> buscarUsuarios(String termino) {
+        // Lógica para filtrar por username o rol usando el repositorio
+        return usuarioRepository.buscarPorNombreORol(termino);
     }
 
     // Devuelve todos los usuarios
@@ -36,11 +43,10 @@ public class UsuarioService implements IUsuarioService {
     // Guarda un usuario nuevo o actualiza si ya existe
     @Override
     public Usuario guardar(Usuario usuario) {
-        // 1. Si es un usuario nuevo, le asignamos lo mínimo para que funcione
+        // 1. Si es un usuario nuevo (código null), asignamos valores por defecto
         if (usuario.getCodigo() == null) {
             usuario.setEstado(1); // Activo por defecto
 
-            // Si no quieres pedir Rol ni Email, asígnalos aquí automáticamente
             if (usuario.getRol() == null) {
                 usuario.setRol("ROLE_USER");
             }
@@ -49,19 +55,10 @@ public class UsuarioService implements IUsuarioService {
             }
         }
 
-        // 2. Validamos solo lo que tú quieres: Username y Password
+        // 2. Validamos Username y Password
         validarRegistroBasico(usuario);
 
         return usuarioRepository.save(usuario);
-    }
-
-    private void validarRegistroBasico(Usuario usuario) {
-        if (usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre de usuario es necesario");
-        }
-        if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
-            throw new IllegalArgumentException("La contraseña es necesaria");
-        }
     }
 
     // Busca un usuario por su código
@@ -98,10 +95,18 @@ public class UsuarioService implements IUsuarioService {
         return usuarioRepository.existsById(codigo);
     }
 
-    // Validaciones internas: revisa que los campos obligatorios estén completos
-    private void validarUsuario(Usuario usuario) {
-        // ELIMINAMOS la validación del código aquí porque se genera solo en la DB
+    // --- MÉTODOS DE VALIDACIÓN PRIVADOS ---
 
+    private void validarRegistroBasico(Usuario usuario) {
+        if (usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de usuario es necesario");
+        }
+        if (usuario.getPassword() == null || usuario.getPassword().trim().isEmpty()) {
+            throw new IllegalArgumentException("La contraseña es necesaria");
+        }
+    }
+
+    private void validarUsuario(Usuario usuario) {
         if (usuario.getUsername() == null || usuario.getUsername().trim().isEmpty()) {
             throw new IllegalArgumentException("El username es obligatorio");
         }

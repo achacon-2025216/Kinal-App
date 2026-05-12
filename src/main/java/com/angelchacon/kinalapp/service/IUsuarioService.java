@@ -14,4 +14,6 @@ public interface IUsuarioService {
     Usuario actualizar(Integer codigo, Usuario usuario);
     void eliminar(Integer codigo);
     boolean existePorCodigo(Integer codigo);
+    // Agrega esta línea a tu IUsuarioService.java
+    List<Usuario> buscarUsuarios(String termino);
 }
