@@ -2,15 +2,13 @@ package com.angelchacon.kinalapp.controller;
 
 import com.angelchacon.kinalapp.entity.Cliente;
 import com.angelchacon.kinalapp.service.IClienteService;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Controller // Cambiado para manejar vistas HTML
+@Controller
 @RequestMapping("/clientes")
 public class ClienteController {
 
@@ -20,47 +18,46 @@ public class ClienteController {
         this.clienteService = clienteService;
     }
 
-    // 1. LISTAR: Ahora devuelve el HTML "listar.html"
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("listaClientes", clienteService.listarTodos());
-        model.addAttribute("clienteEditando", new Cliente()); // Objeto para la modal (crear/editar)
+        model.addAttribute("clienteEditando", new Cliente());
         return "html/listarCliente";
     }
 
-    // 2. FORMULARIO NUEVO: Crea un objeto vacío y abre la página
-    @GetMapping("/nuevo")
-    public String formularioNuevo(Model model) {
-        model.addAttribute("cliente", new Cliente());
-        model.addAttribute("esEdicion", false);
+    // MÉTODO DE BÚSQUEDA INTEGRADO
+    @GetMapping("/buscar")
+    public String buscar(@RequestParam(value = "termino", required = false) String termino, Model model) {
+        List<Cliente> resultados;
+
+        if (termino != null && !termino.trim().isEmpty()) {
+            // Buscamos usando el service y limpiamos espacios con trim()
+            resultados = clienteService.buscarClientes(termino.trim());
+        } else {
+            return "redirect:/clientes";
+        }
+
+        model.addAttribute("listaClientes", resultados);
+        model.addAttribute("clienteEditando", new Cliente());
         return "html/listarCliente";
     }
 
-    // 3. EDITAR: Busca el cliente por DPI y lo manda al formulario
     @GetMapping("/editar/{dpi}")
     public String formularioEditar(@PathVariable String dpi, Model model) {
-        // 1. Buscamos al cliente para editar
         Cliente cliente = clienteService.buscarPorDPI(dpi)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-        // 2. IMPORTANTE: Volvemos a traer la lista para que la tabla NO se vacíe
         model.addAttribute("listaClientes", clienteService.listarTodos());
-
-        // 3. Pasamos el cliente encontrado al objeto que usa el formulario
         model.addAttribute("clienteEditando", cliente);
-        model.addAttribute("esEdicion", true);
-
         return "html/listarCliente";
     }
 
-    // 4. GUARDAR: Recibe los datos y hace un "redirect" a la tabla
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute ("clienteEditando")Cliente cliente) {
+    public String guardar(@ModelAttribute("clienteEditando") Cliente cliente) {
         clienteService.guardar(cliente);
         return "redirect:/clientes";
     }
 
-    // 5. ELIMINAR: Borra el registro y refresca la lista
     @GetMapping("/eliminar/{dpi}")
     public String eliminar(@PathVariable String dpi) {
         clienteService.eliminar(dpi);

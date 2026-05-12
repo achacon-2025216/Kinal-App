@@ -11,7 +11,18 @@
 <div class="container">
     <h2>Gestión de Clientes - Kinal</h2>
 
-    <!-- CAMBIO 1: Ahora USER y ADMIN pueden ver el formulario para AGREGAR -->
+    <!-- SECCIÓN DE BÚSQUEDA EXCLUSIVA PARA ADMIN -->
+    <div class="search-container" sec:authorize="hasRole('ADMIN')" style="margin-bottom: 20px; background: #f4f4f4; padding: 15px; border-radius: 8px;">
+        <form th:action="@{/clientes/buscar}" method="get" style="display: flex; gap: 10px; align-items: center;">
+            <label><strong>Buscar Cliente (Admin):</strong></label>
+            <!-- CAMBIO CLAVE: name="termino" -->
+            <input type="text" name="termino" placeholder="Ingrese nombre o DPI..." class="form-control" style="width: 250px;">
+            <button type="submit" class="btn btn-nuevo">🔍 Buscar</button>
+            <a th:href="@{/clientes}" class="btn btn-editar">Limpiar</a>
+        </form>
+    </div>
+
+    <!-- FORMULARIO PARA AGREGAR/EDITAR -->
     <div class="card-formulario" sec:authorize="hasAnyRole('USER', 'ADMIN')">
         <h3 th:text="${clienteEditando?.dpiCliente != null} ? 'Editar Cliente' : 'Nuevo Cliente'"></h3>
 
@@ -37,11 +48,9 @@
                 </div>
 
                 <div class="form-group">
-                    <!-- El botón de enviar ahora es visible para ambos -->
                     <button type="submit" class="btn btn-nuevo">
                         <span th:text="${clienteEditando?.dpiCliente != null} ? 'Actualizar' : 'Guardar'"></span>
                     </button>
-
                     <a th:if="${clienteEditando?.dpiCliente != null}" th:href="@{/clientes}" class="btn btn-eliminar">Cancelar</a>
                 </div>
             </div>
@@ -65,13 +74,10 @@
             <td th:text="${cliente.apellidoCliente}"></td>
             <td th:text="${cliente.direccion}"></td>
             <td>
-                <!-- CAMBIO 2: Solo ADMIN puede ver Editar y Eliminar -->
                 <div sec:authorize="hasRole('ADMIN')">
                     <a th:href="@{/clientes/editar/{id}(id=${cliente.dpiCliente})}" class="btn btn-editar">Editar</a>
                     <a th:href="@{/clientes/eliminar/{id}(id=${cliente.dpiCliente})}" class="btn btn-eliminar">Eliminar</a>
                 </div>
-
-                <!-- El USER verá este mensaje en la columna de acciones -->
                 <span sec:authorize="hasRole('USER')" style="color: gray; font-style: italic;">Sin permisos de edición</span>
             </td>
         </tr>
