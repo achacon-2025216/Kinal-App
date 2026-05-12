@@ -7,31 +7,39 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "clientes")
-
 public class Cliente {
-    @Id
-    @Column (name = "dpi_cliente")
-    private String dpiCliente;
-    @Column
-    private String nombreCliente;
-    @Column
-    private String apellidoCliente;
-    @Column
-    private String direccion;
-    @Column
-    private Integer estado;
 
+    @Id
+    @Column(name = "dpi_cliente")
+    private String dpiCliente;
+
+    @Column(name = "nombre_cliente")
+    private String nombreCliente;
+
+    @Column(name = "apellido_cliente")
+    private String apellidoCliente;
+
+    @Column(name = "direccion")
+    private String direccion;
+
+    // Solo una definición de estado, con valor 1 por defecto
+    @Column(name = "estado")
+    private Integer estado = 1;
+
+    // Constructor vacío obligatorio para JPA
     public Cliente() {
     }
 
+    // Constructor con parámetros
     public Cliente(String dpiCliente, String nombreCliente, String apellidoCliente, String direccion, Integer estado) {
         this.dpiCliente = dpiCliente;
         this.nombreCliente = nombreCliente;
         this.apellidoCliente = apellidoCliente;
         this.direccion = direccion;
-        this.estado = estado;
+        this.estado = (estado == null) ? 1 : estado; // Si viene nulo, ponemos 1
     }
 
+    // Getters y Setters
     public String getDpiCliente() {
         return dpiCliente;
     }

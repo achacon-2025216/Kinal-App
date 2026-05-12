@@ -11,11 +11,10 @@
 <div class="container">
     <h2>Gestión de Clientes - Kinal</h2>
 
-    <!-- SECCIÓN DE BÚSQUEDA EXCLUSIVA PARA ADMIN -->
-    <div class="search-container" sec:authorize="hasRole('ADMIN')" style="margin-bottom: 20px; background: #f4f4f4; padding: 15px; border-radius: 8px;">
+    <!-- SECCIÓN DE BÚSQUEDA: Ahora disponible para USER y ADMIN -->
+    <div class="search-container" sec:authorize="hasAnyRole('USER', 'ADMIN')" style="margin-bottom: 20px; background: #f4f4f4; padding: 15px; border-radius: 8px;">
         <form th:action="@{/clientes/buscar}" method="get" style="display: flex; gap: 10px; align-items: center;">
-            <label><strong>Buscar Cliente (Admin):</strong></label>
-            <!-- CAMBIO CLAVE: name="termino" -->
+            <label><strong>Buscar Cliente:</strong></label>
             <input type="text" name="termino" placeholder="Ingrese nombre o DPI..." class="form-control" style="width: 250px;">
             <button type="submit" class="btn btn-nuevo">🔍 Buscar</button>
             <a th:href="@{/clientes}" class="btn btn-editar">Limpiar</a>
@@ -74,11 +73,14 @@
             <td th:text="${cliente.apellidoCliente}"></td>
             <td th:text="${cliente.direccion}"></td>
             <td>
+                <!-- CORRECCIÓN: Usar hasRole para ADMIN y un span diferente para USER -->
                 <div sec:authorize="hasRole('ADMIN')">
                     <a th:href="@{/clientes/editar/{id}(id=${cliente.dpiCliente})}" class="btn btn-editar">Editar</a>
                     <a th:href="@{/clientes/eliminar/{id}(id=${cliente.dpiCliente})}" class="btn btn-eliminar">Eliminar</a>
                 </div>
-                <span sec:authorize="hasRole('USER')" style="color: gray; font-style: italic;">Sin permisos de edición</span>
+                <div sec:authorize="hasRole('USER')">
+                    <span style="color: gray; font-style: italic;">Lectura (Usuario)</span>
+                </div>
             </td>
         </tr>
         </tbody>

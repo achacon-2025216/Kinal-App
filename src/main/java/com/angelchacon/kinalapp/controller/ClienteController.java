@@ -5,6 +5,7 @@ import com.angelchacon.kinalapp.service.IClienteService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -20,23 +21,21 @@ public class ClienteController {
 
     @GetMapping
     public String listar(Model model) {
+        // Si el modelo ya trae un cliente (por ejemplo de un error de validación), no lo sobrescribimos
+        if (!model.containsAttribute("clienteEditando")) {
+            model.addAttribute("clienteEditando", new Cliente());
+        }
         model.addAttribute("listaClientes", clienteService.listarTodos());
-        model.addAttribute("clienteEditando", new Cliente());
         return "html/listarCliente";
     }
 
-    // MÉTODO DE BÚSQUEDA INTEGRADO
     @GetMapping("/buscar")
     public String buscar(@RequestParam(value = "termino", required = false) String termino, Model model) {
-        List<Cliente> resultados;
-
-        if (termino != null && !termino.trim().isEmpty()) {
-            // Buscamos usando el service y limpiamos espacios con trim()
-            resultados = clienteService.buscarClientes(termino.trim());
-        } else {
+        if (termino == null || termino.trim().isEmpty()) {
             return "redirect:/clientes";
         }
 
+        List<Cliente> resultados = clienteService.buscarClientes(termino.trim());
         model.addAttribute("listaClientes", resultados);
         model.addAttribute("clienteEditando", new Cliente());
         return "html/listarCliente";
@@ -47,20 +46,30 @@ public class ClienteController {
         Cliente cliente = clienteService.buscarPorDPI(dpi)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
 
-        model.addAttribute("listaClientes", clienteService.listarTodos());
         model.addAttribute("clienteEditando", cliente);
+        model.addAttribute("listaClientes", clienteService.listarTodos());
         return "html/listarCliente";
     }
 
     @PostMapping("/guardar")
-    public String guardar(@ModelAttribute("clienteEditando") Cliente cliente) {
-        clienteService.guardar(cliente);
+    public String guardar(@ModelAttribute("clienteEditando") Cliente cliente, RedirectAttributes flash) {
+        try {
+            clienteService.guardar(cliente);
+            flash.addFlashAttribute("success", "Cliente procesado correctamente.");
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "Error al guardar: " + e.getMessage());
+        }
         return "redirect:/clientes";
     }
 
     @GetMapping("/eliminar/{dpi}")
-    public String eliminar(@PathVariable String dpi) {
-        clienteService.eliminar(dpi);
+    public String eliminar(@PathVariable String dpi, RedirectAttributes flash) {
+        try {
+            clienteService.eliminar(dpi);
+            flash.addFlashAttribute("success", "Cliente eliminado.");
+        } catch (Exception e) {
+            flash.addFlashAttribute("error", "No se pudo eliminar el cliente.");
+        }
         return "redirect:/clientes";
     }
 }
