@@ -11,17 +11,26 @@
 <div class="container">
     <h2>Gestión de Usuarios - Kinal</h2>
 
-    <!-- CAMBIO 1: Ahora USER y ADMIN pueden ver el formulario para AGREGAR usuarios -->
+    <!-- SECCIÓN DE BÚSQUEDA EXCLUSIVA PARA ADMIN -->
+    <div class="search-container" sec:authorize="hasRole('ADMIN')" style="margin-bottom: 20px; background: #f4f4f4; padding: 15px; border-radius: 8px;">
+        <form th:action="@{/usuarios/buscar}" method="get" style="display: flex; gap: 10px; align-items: center;">
+            <label><strong>Buscar Usuario (Admin):</strong></label>
+            <!-- name="termino" para que coincida con el Controller -->
+            <input type="text" name="termino" placeholder="Username o Rol..." class="form-control" style="width: 250px;">
+            <button type="submit" class="btn btn-nuevo">🔍 Buscar</button>
+            <a th:href="@{/usuarios}" class="btn btn-editar">Limpiar</a>
+        </form>
+    </div>
+
+    <!-- FORMULARIO PARA AGREGAR/EDITAR -->
     <div class="card-formulario" sec:authorize="hasAnyRole('USER', 'ADMIN')">
         <h3 th:text="${usuarioEditando.codigo != null} ? 'Editar Usuario' : 'Nuevo Usuario'"></h3>
 
         <form th:action="@{/usuarios/guardar}" th:object="${usuarioEditando}" method="post">
             <div class="form-row">
-                <div class="form-group">
+                <div class="form-group" th:if="${usuarioEditando.codigo != null}">
                     <label>Código:</label>
-                    <input type="number" th:field="*{codigo}"
-                           th:readonly="${usuarioEditando.codigo != null}"
-                           class="form-control" required />
+                    <input type="number" th:field="*{codigo}" class="form-control" readonly />
                 </div>
 
                 <div class="form-group">
@@ -38,12 +47,11 @@
                     <label>Password:</label>
                     <input type="password" th:field="*{password}" class="form-control"
                            th:required="${usuarioEditando.codigo == null}"
-                           placeholder="Contraseña" />
+                           placeholder="Nueva contraseña o actual" />
                 </div>
 
                 <div class="form-group">
                     <label>Rol:</label>
-                    <!-- El USER puede crear otros USER, pero el ADMIN controla todo -->
                     <select th:field="*{rol}" class="form-control">
                         <option value="ROLE_USER">Usuario</option>
                         <option value="ROLE_ADMIN" sec:authorize="hasRole('ADMIN')">Administrador</option>
@@ -87,13 +95,11 @@
             <td th:text="${user.email}"></td>
             <td th:text="${user.rol}"></td>
             <td>
-                <!-- CAMBIO 2: Solo el ADMIN puede ver los botones de Editar y Eliminar -->
                 <div sec:authorize="hasRole('ADMIN')">
                     <a th:href="@{/usuarios/editar/{id}(id=${user.codigo})}" class="btn btn-editar">Editar</a>
                     <a th:href="@{/usuarios/eliminar/{id}(id=${user.codigo})}" class="btn btn-eliminar"
                        onclick="return confirm('¿Deseas eliminar este usuario?')">Eliminar</a>
                 </div>
-                <!-- El USER verá esto en lugar de los botones -->
                 <span sec:authorize="hasRole('USER')" style="color: gray; font-style: italic;">Solo lectura</span>
             </td>
         </tr>

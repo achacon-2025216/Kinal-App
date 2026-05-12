@@ -7,6 +7,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 public class UsuarioController {
 
@@ -16,6 +18,22 @@ public class UsuarioController {
     public UsuarioController(IUsuarioService usuarioService, PasswordEncoder passwordEncoder) {
         this.usuarioService = usuarioService;
         this.passwordEncoder = passwordEncoder;
+    }
+
+    // --- NUEVO MÉTODO DE BÚSQUEDA ---
+    @GetMapping("/usuarios/buscar")
+    public String buscar(@RequestParam(value = "termino", required = false) String termino, Model model) {
+        List<Usuario> resultados;
+
+        if (termino != null && !termino.trim().isEmpty()) {
+            resultados = usuarioService.buscarUsuarios(termino.trim());
+        } else {
+            return "redirect:/usuarios";
+        }
+
+        model.addAttribute("listaUsuarios", resultados);
+        model.addAttribute("usuarioEditando", new Usuario());
+        return "html/listarUsuario";
     }
 
     @GetMapping("/usuarios")
