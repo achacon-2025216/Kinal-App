@@ -63,4 +63,13 @@ public class DetalleVentaController {
 
     // El método editar se mantiene igual, pero recuerda que al editar
     // tendrías que manejar la lógica de ajuste de stock (sumar el viejo y restar el nuevo)
+    @GetMapping("/buscar")
+    public String buscar(@RequestParam("termino") String termino, Model model) {
+        // Aquí puedes filtrar por ID de factura o nombre de producto
+        model.addAttribute("listaDetalles", detalleService.listarTodos());
+        model.addAttribute("listaVentas", ventaService.listarTodos());
+        model.addAttribute("listaProductos", productoService.listarTodos());
+        model.addAttribute("detalleNuevo", new DetalleVenta());
+        return "html/listarDetalleVenta";
+    }
 }
