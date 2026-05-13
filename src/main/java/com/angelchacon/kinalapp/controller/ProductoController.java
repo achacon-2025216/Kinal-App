@@ -27,6 +27,20 @@ public class ProductoController {
         return "html/listarProducto";
     }
 
+    // NUEVO: Método de búsqueda
+    @GetMapping("/buscar")
+    public String buscar(@RequestParam(value = "termino", required = false) String termino, Model model) {
+        List<Producto> resultados;
+        if (termino != null && !termino.trim().isEmpty()) {
+            resultados = productoService.buscarProductos(termino.trim());
+        } else {
+            return "redirect:/productos";
+        }
+        model.addAttribute("listaProductos", resultados);
+        model.addAttribute("productoEditando", new Producto());
+        return "html/listarProducto";
+    }
+
     @PostMapping("/guardar")
     public String guardar(@ModelAttribute Producto producto) {
         productoService.guardar(producto);
@@ -35,9 +49,8 @@ public class ProductoController {
 
     @GetMapping("/editar/{id}")
     public String editar(@PathVariable Integer id, Model model) {
-        // Buscamos el producto y lo mandamos al formulario
-        model.addAttribute("productoEditando", productoService.buscarPorCodigo(id).orElse(new Producto()));
-        // Cargamos la lista para la tabla
+        Producto p = productoService.buscarPorCodigo(id).orElse(new Producto());
+        model.addAttribute("productoEditando", p);
         model.addAttribute("listaProductos", productoService.listarTodos());
         return "html/listarProducto";
     }

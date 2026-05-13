@@ -4,9 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Kinal App - Inventario de Productos</title>
+    <!-- Bootstrap 5 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" th:href="@{/css/listarProducto.css}">
+    
 </head>
 <body>
 
@@ -16,27 +17,41 @@
         <p class="text-muted">Control de stock e inventario - Kinal App</p>
     </header>
 
+    <!-- BARRA DE BÚSQUEDA (Visible para todos los usuarios autenticados) -->
+    <div class="search-bar shadow-sm">
+        <form th:action="@{/productos/buscar}" method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label class="fw-bold text-dark"><i class="bi bi-search"></i> Buscar:</label>
+            </div>
+            <div class="col-md-6">
+                <input type="text" name="termino" class="form-control" placeholder="Ingrese nombre del producto..." required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-kinal">Filtrar</button>
+                <a th:href="@{/productos}" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </form>
+    </div>
+
     <div class="row g-4">
-        <!-- BLOQUEO 1: El formulario solo es visible para ADMIN -->
+        <!-- FORMULARIO: Solo visible para ADMIN -->
         <div class="col-lg-4" sec:authorize="hasRole('ADMIN')">
-            <div class="card border-0 shadow-sm p-4 form-card">
+            <div class="card shadow-sm p-4 form-card">
                 <h3 class="mb-4" style="color: #141A3D;"
-                    th:text="${productoEditando.codigoProducto != null} ? 'Editar Producto' : 'Nuevo Producto'">
+                    th:text="${productoEditando.codigoProducto != null} ? 'Editar Producto' : 'Registrar Producto'">
                     Nuevo Producto
                 </h3>
 
                 <form th:action="@{/productos/guardar}" th:object="${productoEditando}" method="post">
-
+                    <!-- Campo oculto para el ID en caso de edición -->
                     <input type="hidden" th:field="*{codigoProducto}">
 
-                    <div class="mb-3" th:if="${productoEditando.codigoProducto == null}">
-                        <label class="form-label fw-semibold">Código</label>
-                        <input type="number" th:field="*{codigoProducto}" class="form-control" placeholder="ID del producto" required>
-                    </div>
+                    <!-- Campo oculto para el estado, asegurando que se mantenga en 1 -->
+                    <input type="hidden" th:field="*{estado}">
 
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Nombre del Producto</label>
-                        <input type="text" th:field="*{nombreProducto}" class="form-control" placeholder="Ej. Jugos" required>
+                        <input type="text" th:field="*{nombreProducto}" class="form-control" placeholder="Nombre comercial" required>
                     </div>
 
                     <div class="row">
@@ -45,71 +60,69 @@
                             <input type="number" step="0.01" th:field="*{precio}" class="form-control" placeholder="0.00" required>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label fw-semibold">Stock</label>
-                            <input type="number" th:field="*{stock}" class="form-control" placeholder="Cant." required>
+                            <label class="form-label fw-semibold">Stock Inicial</label>
+                            <input type="number" th:field="*{stock}" class="form-control" placeholder="0" required>
                         </div>
                     </div>
 
-                    <div class="d-grid gap-2 mt-3">
-                        <button type="submit" class="btn btn-save btn-primary">
-                            <i class="bi bi-save"></i>
-                            <span th:text="${productoEditando.codigoProducto != null} ? ' Actualizar' : ' Guardar'"></span>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-kinal">
+                            <i class="bi bi-cloud-arrow-up"></i>
+                            <span th:text="${productoEditando.codigoProducto != null} ? ' Actualizar Datos' : ' Guardar Producto'"></span>
                         </button>
 
                         <a th:href="@{/productos}" class="btn btn-light border" th:if="${productoEditando.codigoProducto != null}">
-                            Cancelar
+                            Cancelar Edición
                         </a>
 
-                        <a th:href="@{/}" class="btn btn-outline-secondary">
-                            <i class="bi bi-arrow-left"></i> Volver al Inicio
+                        <a th:href="@{/}" class="btn btn-outline-dark mt-2">
+                            <i class="bi bi-house-door"></i> Ir al Menú
                         </a>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- Ajuste de columna: col-lg-8 si hay form (admin), col-lg-12 si no lo hay (user) -->
+        <!-- TABLA DE INVENTARIO: Ajusta ancho según rol (8 si es Admin, 12 si es User) -->
         <div th:class="${#authorization.expression('hasRole(''ADMIN'')')} ? 'col-lg-8' : 'col-lg-12'">
-            <div class="card border-0 shadow-sm p-4">
+            <div class="card shadow-sm p-4 table-card">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h3 style="color: #141A3D; margin: 0;">Inventario Actual</h3>
-                    <!-- Botón volver visible para USER (ya que el del form desaparece) -->
-                    <a th:href="@{/}" class="btn btn-sm btn-outline-secondary" sec:authorize="hasRole('USER')">
-                        <i class="bi bi-arrow-left"></i> Menú Principal
-                    </a>
+                    <h3 style="color: #141A3D; margin: 0;">Stock Disponible</h3>
+                    <span class="badge rounded-pill bg-primary" th:text="${#lists.size(listaProductos)} + ' Productos'"></span>
                 </div>
 
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
                         <thead>
                         <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Precio</th>
-                            <th>Stock</th>
-                            <!-- BLOQUEO 2: Encabezado de acciones solo para ADMIN -->
-                            <th class="text-center" sec:authorize="hasRole('ADMIN')">Acciones</th>
+                            <th class="px-3">Código</th>
+                            <th>Descripción</th>
+                            <th>Precio Unitario</th>
+                            <th>Existencias</th>
+                            <th class="text-center" sec:authorize="hasRole('ADMIN')">Gestión</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="p : ${listaProductos}">
-                            <td th:text="${p.codigoProducto}"></td>
+                            <td class="px-3" th:text="${p.codigoProducto}"></td>
                             <td class="fw-bold" th:text="${p.nombreProducto}"></td>
-                            <td th:text="'Q' + ${p.precio}"></td>
+                            <td th:text="'Q' + ${#numbers.formatDecimal(p.precio, 1, 2)}"></td>
                             <td>
-                                <span th:class="${p.stock < 10} ? 'badge bg-danger' : 'badge bg-success'"
+                                <!-- Alerta visual si hay poco stock (menos de 10) -->
+                                <span th:class="${p.stock <= 10} ? 'badge bg-danger' : 'badge bg-success'"
                                       th:text="${p.stock}"></span>
                             </td>
-                            <!-- BLOQUEO 3: Botones de editar/eliminar solo para ADMIN -->
+                            <!-- Acciones exclusivas para ADMIN -->
                             <td class="text-center" sec:authorize="hasRole('ADMIN')">
                                 <a th:href="@{/productos/editar/{id}(id=${p.codigoProducto})}"
-                                   class="btn btn-outline-warning btn-sm me-1">
+                                   class="btn btn-sm btn-warning text-dark me-1" title="Editar">
                                     <i class="bi bi-pencil-square"></i>
                                 </a>
 
                                 <a th:href="@{/productos/eliminar/{id}(id=${p.codigoProducto})}"
-                                   class="btn btn-outline-danger btn-sm"
-                                   onclick="return confirm('¿Eliminar este producto?')">
+                                   class="btn btn-sm btn-danger text-white"
+                                   title="Eliminar"
+                                   onclick="return confirm('¿Está seguro de ocultar este producto del inventario?')">
                                     <i class="bi bi-trash"></i>
                                 </a>
                             </td>
@@ -117,10 +130,23 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- Mensaje si no hay resultados -->
+                <div th:if="${#lists.isEmpty(listaProductos)}" class="alert alert-warning text-center mt-3">
+                    <i class="bi bi-exclamation-triangle"></i> No se encontraron productos en el inventario.
+                </div>
+
+                <!-- Botón volver para USER -->
+                <div class="mt-3 text-center" sec:authorize="hasRole('USER')">
+                    <a th:href="@{/}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left-circle"></i> Regresar al Inicio
+                    </a>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

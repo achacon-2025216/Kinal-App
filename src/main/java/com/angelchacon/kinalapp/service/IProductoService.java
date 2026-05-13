@@ -9,4 +9,6 @@ public interface IProductoService {
     Producto guardar(Producto producto);
     Optional<Producto> buscarPorCodigo(Integer codigo);
     void eliminar(Integer codigo);
+
+    List<Producto> buscarProductos(String termino);
 }

@@ -18,11 +18,16 @@ public class ProductoService implements IProductoService {
 
     @Override
     public List<Producto> listarTodos() {
-        return productoRepository.findAll();
+        // Mostramos solo los que no están eliminados lógicamente
+        return productoRepository.findByEstado(1);
     }
 
     @Override
     public Producto guardar(Producto producto) {
+        // Si es un producto nuevo, forzamos el estado a 1
+        if (producto.getEstado() == null) {
+            producto.setEstado(1);
+        }
         return productoRepository.save(producto);
     }
 
@@ -33,6 +38,15 @@ public class ProductoService implements IProductoService {
 
     @Override
     public void eliminar(Integer codigo) {
-        productoRepository.deleteById(codigo);
+        // Borrado lógico: buscamos el producto y cambiamos su estado a 0
+        productoRepository.findById(codigo).ifPresent(p -> {
+            p.setEstado(0);
+            productoRepository.save(p);
+        });
+    }
+
+    @Override
+    public List<Producto> buscarProductos(String termino) {
+        return productoRepository.buscarPorNombre(termino);
     }
 }
