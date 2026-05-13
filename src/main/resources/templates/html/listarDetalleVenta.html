@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"> <!-- 1. Agregamos el espacio de nombres de seguridad -->
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8">
     <title>Kinal App - Detalles de Venta</title>
@@ -9,7 +9,6 @@
 </head>
 <body class="bg-light">
 
-
 <div class="container py-5">
     <header class="text-center mb-5">
         <h1 style="color: #141A3D; font-weight: 700;">Detalles de Facturación</h1>
@@ -17,7 +16,7 @@
     </header>
 
     <div class="row g-4">
-        <!-- BLOQUEO 1: Solo el ADMIN puede ver la columna del formulario (col-md-4) -->
+        <!-- FORMULARIO: Solo visible para ADMIN -->
         <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
             <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
                 <h4 class="mb-4" style="color: #141A3D;"
@@ -27,23 +26,28 @@
                 <form th:action="@{/detalles/guardar}" th:object="${detalleNuevo}" method="post">
                     <input type="hidden" th:field="*{codigoDetalleVenta}">
 
+                    <!-- ... (resto del código igual) ... -->
+
                     <div class="mb-3">
-                        <label class="form-label fw-bold">Seleccionar Venta (ID)</label>
+                        <label class="form-label fw-bold">Seleccionar Venta (Factura)</label>
                         <select th:field="*{venta.codigoVenta}" class="form-select" required>
                             <option value="" disabled selected>--- Seleccione Venta ---</option>
                             <option th:each="v : ${listaVentas}"
                                     th:value="${v.codigoVenta}"
-                                    th:text="'Venta #' + ${v.codigoVenta}"></option>
+                                    th:text="'Factura #' + ${v.codigoVenta} + ' - ' + ${v.cliente?.nombreCliente ?: 'Cliente no asignado'}"></option>
                         </select>
                     </div>
+
+
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Producto</label>
                         <select th:field="*{producto.codigoProducto}" class="form-select" required>
                             <option value="" disabled selected>--- Seleccione Producto ---</option>
+                            <!-- Actualizado para mostrar el Stock disponible -->
                             <option th:each="p : ${listaProductos}"
                                     th:value="${p.codigoProducto}"
-                                    th:text="${p.nombreProducto}"></option>
+                                    th:text="${p.nombreProducto} + ' (Disponibles: ' + ${p.stock} + ')'"></option>
                         </select>
                     </div>
 
@@ -54,66 +58,72 @@
                         </div>
                         <div class="col-6 mb-3">
                             <label class="form-label fw-bold">Precio Unit.</label>
-                            <input type="number" step="0.01" th:field="*{precioUnitario}" class="form-control" required>
+                            <!-- readonly para que el usuario no lo altere, se asigna en el controlador -->
+                            <input type="text" class="form-control bg-light" placeholder="Automático" readonly>
+                            <!-- El input real para el objeto se maneja oculto o mediante el controlador -->
+                            <input type="hidden" th:field="*{precioUnitario}">
                         </div>
                     </div>
 
                     <div class="d-grid gap-2 mt-3">
                         <button type="submit" class="btn text-white" style="background-color: #141A3D;">
-                            <i class="bi bi-save"></i>
-                            <span th:text="${detalleNuevo.codigoDetalleVenta != null} ? ' Actualizar' : ' Agregar'"></span>
+                            <i class="bi bi-cart-plus"></i>
+                            <span th:text="${detalleNuevo.codigoDetalleVenta != null} ? ' Actualizar' : ' Agregar a Venta'"></span>
                         </button>
-                        <a th:href="@{/detalles}" class="btn btn-secondary" th:if="${detalleNuevo.codigoDetalleVenta != null}">Cancelar</a>
-                        <a th:href="@{/}" class="btn btn-light border">Regresar</a>
+                        <a th:href="@{/detalles}" class="btn btn-secondary" th:if="${detalleNuevo.codigoDetalleVenta != null}">Cancelar Edición</a>
+                        <a th:href="@{/}" class="btn btn-outline-secondary">Regresar</a>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- La tabla ocupa todo el ancho (col-12) si no es admin, o solo col-md-8 si es admin -->
+        <!-- TABLA DE DETALLES -->
         <div th:class="${#authorization.expression('hasRole(''ADMIN'')')} ? 'col-md-8' : 'col-md-12'">
             <div class="card border-0 shadow-sm p-4" style="border-radius: 15px;">
 
-                <!-- Si es usuario normal, mostramos el botón de regresar aquí arriba porque el del form desapareció -->
                 <div class="mb-3" sec:authorize="hasRole('USER')">
-                    <a th:href="@{/}" class="btn btn-light border btn-sm">← Regresar al menú</a>
+                    <a th:href="@{/}" class="btn btn-light border btn-sm">← Volver al Menú Principal</a>
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover align-middle">
                         <thead style="background-color: #141A3D; color: white;">
                         <tr>
-                            <th>Venta</th>
+                            <th>Factura</th>
                             <th>Producto</th>
-                            <th>Cant.</th>
+                            <th class="text-center">Cantidad</th>
                             <th>Precio U.</th>
                             <th>Subtotal</th>
-                            <!-- BLOQUEO 2: El encabezado de Acciones solo para ADMIN -->
-                            <th sec:authorize="hasRole('ADMIN')">Acciones</th>
+                            <th sec:authorize="hasRole('ADMIN')" class="text-center">Acciones</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:each="d : ${listaDetalles}">
                             <td th:text="'#' + ${d.venta.codigoVenta}"></td>
-                            <td th:text="${d.producto.nombreProducto}"></td>
-                            <td th:text="${d.cantidad}"></td>
-                            <td th:text="'Q' + ${d.precioUnitario}"></td>
-                            <td class="fw-bold text-primary" th:text="'Q' + ${d.subtotal}"></td>
-                            <!-- BLOQUEO 3: Los botones de editar/eliminar solo para ADMIN -->
-                            <td sec:authorize="hasRole('ADMIN')">
-                                <a th:href="@{/detalles/editar/{id}(id=${d.codigoDetalleVenta})}" class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                                <a th:href="@{/detalles/eliminar/{id}(id=${d.codigoDetalleVenta})}" class="btn btn-sm btn-outline-danger" onclick="return confirm('¿Eliminar?')"><i class="bi bi-trash"></i></a>
+                            <td class="fw-bold" th:text="${d.producto.nombreProducto}"></td>
+                            <td class="text-center" th:text="${d.cantidad}"></td>
+                            <td th:text="'Q' + ${#numbers.formatDecimal(d.precioUnitario, 1, 2)}"></td>
+                            <td class="fw-bold text-success" th:text="'Q' + ${#numbers.formatDecimal(d.subtotal, 1, 2)}"></td>
+                            <td sec:authorize="hasRole('ADMIN')" class="text-center">
+                                <a th:href="@{/detalles/editar/{id}(id=${d.codigoDetalleVenta})}"
+                                   class="btn btn-sm btn-outline-warning" title="Editar"><i class="bi bi-pencil"></i></a>
+                                <a th:href="@{/detalles/eliminar/{id}(id=${d.codigoDetalleVenta})}"
+                                   class="btn btn-sm btn-outline-danger"
+                                   onclick="return confirm('¿Seguro que deseas eliminar este item? Se devolverá el stock al inventario.')"
+                                   title="Eliminar"><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
-                <div th:if="${#lists.isEmpty(listaDetalles)}" class="alert alert-info text-center mt-3">
-                    No hay productos asignados a ninguna venta todavía.
+
+                <div th:if="${#lists.isEmpty(listaDetalles)}" class="alert alert-info text-center mt-3 border-0">
+                    <i class="bi bi-info-circle me-2"></i> No se han registrado movimientos de inventario todavía.
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 </body>
 </html>
