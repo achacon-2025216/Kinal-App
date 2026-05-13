@@ -42,11 +42,17 @@ public class UsuarioService implements IUsuarioService {
         if (usuario.getCodigo() == null) {
             usuario.setEstado(1); // Activo por defecto
 
-            // REGLA: Cualquier registro nuevo siempre será USER
-            usuario.setRol("USER");
+            // CORRECCIÓN CRÍTICA: Debe incluir el prefijo ROLE_
+            // para que coincida con SecurityConfig y tu imagen image_e87358.png
+            usuario.setRol("ROLE_USER");
 
             if (usuario.getEmail() == null) {
-                usuario.setEmail(usuario.getUsername() + "@kinalapp.com");
+                usuario.setEmail(usuario.getUsername() + "@kinal.edu.gt");
+            }
+        } else {
+            // 2. Si es una actualización y por alguna razón el rol viene vacío
+            if (usuario.getRol() == null || usuario.getRol().isEmpty()) {
+                usuario.setRol("ROLE_USER");
             }
         }
 
