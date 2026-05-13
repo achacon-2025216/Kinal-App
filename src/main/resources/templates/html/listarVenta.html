@@ -9,7 +9,6 @@
     <style>
         body { background-color: #f8f9fa; }
         .card { border-radius: 15px; border: none; }
-        .table thead { background-color: #141A3D; color: white; }
         .btn-kinal { background-color: #141A3D; color: white; }
         .btn-kinal:hover { background-color: #0d122b; color: white; }
     </style>
@@ -22,34 +21,28 @@
         <p class="text-muted">Registro de transacciones comerciales - Fundación Kinal</p>
     </header>
 
-    <!-- BARRA DE BÚSQUEDA (Solo Admin) -->
-    <div class="row mb-4" sec:authorize="hasRole('ADMIN')">
-        <div class="col-12">
-            <div class="card shadow-sm p-3">
-                <form th:action="@{/ventas/buscar}" method="get" class="row g-3 align-items-center">
-                    <div class="col-auto">
-                        <label class="fw-bold"><i class="bi bi-search"></i> Buscar Venta:</label>
-                    </div>
-                    <div class="col-md-5">
-                        <input type="text" name="termino" class="form-control" placeholder="Nombre del cliente o ID de venta...">
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-kinal">Filtrar</button>
-                        <a th:href="@{/ventas}" class="btn btn-outline-secondary">Limpiar</a>
-                    </div>
-                </form>
+    <!-- BARRA DE BÚSQUEDA: Visible para todos -->
+    <div class="card shadow-sm p-3 mb-4">
+        <form th:action="@{/ventas/buscar}" method="get" class="row g-3 align-items-center">
+            <div class="col-auto">
+                <label class="fw-bold"><i class="bi bi-search"></i> Buscar Venta:</label>
             </div>
-        </div>
+            <div class="col-md-5">
+                <input type="text" name="termino" class="form-control" placeholder="Cliente o ID...">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-kinal">Filtrar</button>
+                <a th:href="@{/ventas}" class="btn btn-outline-secondary">Limpiar</a>
+            </div>
+        </form>
     </div>
 
     <div class="row g-4">
-        <!-- FORMULARIO (ADMIN) -->
-        <div class="col-md-4" sec:authorize="hasRole('ADMIN')">
+        <!-- FORMULARIO: ADMIN y USER -->
+        <div class="col-md-4" sec:authorize="hasAnyRole('ADMIN', 'USER')">
             <div class="card shadow-sm p-4">
-                <h2 style="color: #141A3D; font-size: 1.5rem;" class="mb-4"
-                    th:text="${ventaEditando.codigoVenta != null} ? 'Editar Venta' : 'Nueva Venta'">
-                    Nueva Venta
-                </h2>
+                <h2 style="color: #141A3D; font-size: 1.2rem;" class="mb-4"
+                    th:text="${ventaEditando.codigoVenta != null} ? 'Editar Venta' : 'Nueva Venta'"></h2>
 
                 <form th:action="@{/ventas/guardar}" th:object="${ventaEditando}" method="post">
                     <input type="hidden" th:field="*{codigoVenta}">
@@ -61,16 +54,14 @@
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Total (Q)</label>
-                        <input type="number" step="0.01" th:field="*{total}" class="form-control" placeholder="0.00" required>
+                        <input type="number" step="0.01" th:field="*{total}" class="form-control" required>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label fw-bold">Cliente</label>
                         <select th:field="*{cliente.dpiCliente}" class="form-select" required>
                             <option value="" disabled selected>--- Seleccione Cliente ---</option>
-                            <option th:each="c : ${listaClientes}"
-                                    th:value="${c.dpiCliente}"
-                                    th:text="${c.nombreCliente}"></option>
+                            <option th:each="c : ${listaClientes}" th:value="${c.dpiCliente}" th:text="${c.nombreCliente}"></option>
                         </select>
                     </div>
 
@@ -78,9 +69,7 @@
                         <label class="form-label fw-bold">Vendedor</label>
                         <select th:field="*{usuario.codigo}" class="form-select" required>
                             <option value="" disabled selected>--- Seleccione Vendedor ---</option>
-                            <option th:each="u : ${listaUsuarios}"
-                                    th:value="${u.codigo}"
-                                    th:text="${u.username}"></option>
+                            <option th:each="u : ${listaUsuarios}" th:value="${u.codigo}" th:text="${u.username}"></option>
                         </select>
                     </div>
 
@@ -89,23 +78,20 @@
                             <i class="bi bi-save"></i>
                             <span th:text="${ventaEditando.codigoVenta != null} ? ' Actualizar' : ' Registrar'"></span>
                         </button>
-                        <a th:href="@{/ventas}" class="btn btn-light border" th:if="${ventaEditando.codigoVenta != null}">Cancelar</a>
-                        <a th:href="@{/}" class="btn btn-outline-secondary"><i class="bi bi-house"></i> Inicio</a>
+                        <a th:href="@{/}" class="btn btn-outline-secondary">Inicio</a>
                     </div>
                 </form>
             </div>
         </div>
 
-        <!-- TABLA DE RESULTADOS -->
-        <div th:class="${#authorization.expression('hasRole(''ADMIN'')')} ? 'col-md-8' : 'col-md-12'">
+        <!-- TABLA DE HISTORIAL -->
+        <div class="col-md-8">
             <div class="card shadow-sm p-4">
-                <h2 style="color: #141A3D; font-size: 1.5rem;" class="mb-4">Historial de Ventas</h2>
-
                 <div class="table-responsive">
                     <table class="table table-hover align-middle">
-                        <thead>
+                        <thead class="table-dark">
                         <tr>
-                            <th class="px-3">ID</th>
+                            <th>ID</th>
                             <th>Fecha</th>
                             <th>Cliente</th>
                             <th>Total</th>
@@ -114,26 +100,17 @@
                         </thead>
                         <tbody>
                         <tr th:each="v : ${listaVentas}">
-                            <td class="px-3" th:text="${v.codigoVenta}"></td>
+                            <td th:text="${v.codigoVenta}"></td>
                             <td th:text="${v.fechaVenta}"></td>
-                            <td th:text="${v.cliente != null ? v.cliente.nombreCliente : 'N/A'}"></td>
-                            <td class="fw-bold text-success" th:text="${v.total != null ? 'Q' + v.total : 'Q0.00'}"></td>
+                            <td th:text="${v.cliente?.nombreCliente ?: 'N/A'}"></td>
+                            <td class="fw-bold text-success" th:text="'Q' + ${v.total ?: '0.00'}"></td>
                             <td class="text-center" sec:authorize="hasRole('ADMIN')">
-                                <a th:href="@{/ventas/editar/{id}(id=${v.codigoVenta})}" class="btn btn-sm btn-warning">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <a th:href="@{/ventas/eliminar/{id}(id=${v.codigoVenta})}" class="btn btn-sm btn-danger"
-                                   onclick="return confirm('¿Eliminar esta venta?')">
-                                    <i class="bi bi-trash"></i>
-                                </a>
+                                <a th:href="@{/ventas/editar/{id}(id=${v.codigoVenta})}" class="btn btn-sm btn-warning"><i class="bi bi-pencil"></i></a>
+                                <a th:href="@{/ventas/eliminar/{id}(id=${v.codigoVenta})}" class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar?')"><i class="bi bi-trash"></i></a>
                             </td>
                         </tr>
                         </tbody>
                     </table>
-                </div>
-
-                <div th:if="${#lists.isEmpty(listaVentas)}" class="alert alert-info text-center">
-                    No se encontraron registros que coincidan con la búsqueda.
                 </div>
             </div>
         </div>
